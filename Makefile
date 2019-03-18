@@ -4,7 +4,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BUILD=./build
-BASE_OUT=base
+CONTROLLER_OUT=controller
 ROOMBA_OUT=roomba
 
 CC=avr-gcc
@@ -12,8 +12,8 @@ OBJCOPY=avr-objcopy
 
 MMCU=atmega2560
 
-BASE_MAIN = main_base.c
-BASE_ROOMBA = main_roomba.c
+ROOMBA_MAIN = main_roomba.c
+CONTROLLER_MAIN = main_controller.c
 
 # All source files EXCEPT main
 LIB_SOURCES = \
@@ -21,18 +21,21 @@ LIB_SOURCES = \
 	sched_timer.c \
 	tta.c
 
-SOURCES_BASE = $(LIB_SOURCES) $(BASE_MAIN)
-SOURCES_ROOMBA = $(LIB_SOURCES) $(BASE_ROOMBA)
+SOURCES_CONTROLLER = $(LIB_SOURCES) $(CONTROLLER_MAIN)
+SOURCES_ROOMBA = $(LIB_SOURCES) $(ROOMBA_MAIN)
 
-all: $(BUILD)/$(BASE_OUT).hex $(BUILD)/$(ROOMBA_OUT).hex
+all: $(BUILD)/$(CONTROLLER_OUT).hex $(BUILD)/$(ROOMBA_OUT).hex
 
-upload: $(BUILD)/$(BASE_OUT).hex $(BUILD)/$(ROOMBA_OUT).hex
-	MMCU=$(MMCU) ./utils/program.py $(BUILD)/$(OUT).hex
+upload_controller: $(BUILD)/$(CONTROLLER_OUT).hex
+	MMCU=$(MMCU) ./utils/program.py $<
+
+upload_roomba: $(BUILD)/$(ROOMBA_OUT).hex
+	MMCU=$(MMCU) ./utils/program.py $<
 
 $(BUILD)/%.hex: $(BUILD)/%.elf
 	$(OBJCOPY) -j .text -j .data -O ihex $< $@
 
-$(BUILD)/$(BASE_OUT).elf: $(addprefix $(BUILD)/,$(SOURCES_BASE:.c=.o))
+$(BUILD)/$(CONTROLLER_OUT).elf: $(addprefix $(BUILD)/,$(SOURCES_CONTROLLER:.c=.o))
 	$(CC) -mmcu=$(MMCU) -o $@ $^
 
 $(BUILD)/$(ROOMBA_OUT).elf: $(addprefix $(BUILD)/,$(SOURCES_ROOMBA:.c=.o))
