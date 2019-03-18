@@ -1,0 +1,4 @@
+# Build files
+*.o
+*.elf
+*.hex
