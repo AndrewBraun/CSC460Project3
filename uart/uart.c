@@ -46,7 +46,7 @@ void uart_init(UART_BPS bitrate)
 		UBRR0L = 51;
 #elif F_CPU==16000000UL
 	case UART_19200:
-		UBRR0L = 103
+		UBRR0L = 103;
 		break;
 	case UART_38400:
 		UBRR0L = 51;
