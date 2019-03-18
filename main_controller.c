@@ -35,7 +35,7 @@ int main() {
 	
 	Scheduler_Init();
 	
-	Scheduler_StartPeriodicTask(30000,30000,switch_mode_task(),NULL);
+	Scheduler_StartPeriodicTask(30000,30000,switch_mode_task,NULL);
 	
 	Scheduler_Start();
 	*/
