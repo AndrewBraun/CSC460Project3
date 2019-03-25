@@ -3,11 +3,28 @@
  * Roomba program entry point.
  */
 
-#include "roomba/roomba.h"
+#include "uart/uart.h"
+#include "message/message.h"
 
 int main() {
-	Roomba_Init();
-	Roomba_Drive(100, 0);
+	uart_init(UART_19200);
+
+	CmdMoveRoombaArgs_t args;
+	args.wheelLeft = 127;
+	args.wheelRight = 127;
+
+	char* msgBuf;
+	int len = CmdMoveRoomba_encode(&msgBuf, &args);
+
+	// Turn on a light if we get an error
+	if (len == -1)
+	{
+		DDRB = 0xFF;
+		PORTB = 0xFF;
+	}
+
+	for (int i = 0; i < len; i++)
+		uart_putchar(msgBuf[i]);
 
 	while (1);
 }

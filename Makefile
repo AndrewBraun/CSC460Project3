@@ -24,7 +24,8 @@ LIB_SOURCES = \
 	tta.c \
 	sched_timer.c \
 	uart/uart.c \
-	roomba/roomba.c
+	roomba/roomba.c \
+	message/message.c
 
 SOURCES_CONTROLLER = $(LIB_SOURCES) $(CONTROLLER_MAIN)
 SOURCES_ROOMBA = $(LIB_SOURCES) $(ROOMBA_MAIN)
