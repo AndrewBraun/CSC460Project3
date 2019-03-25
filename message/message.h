@@ -23,6 +23,7 @@ typedef struct {
 } CmdMoveRoombaArgs_t;
 
 int8_t CmdMoveRoomba_encode(char **msgBuf, CmdMoveRoombaArgs_t const* args);
+CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf);
 
 /**
  * Generic functions for encoding and decoding
@@ -39,6 +40,11 @@ int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out
 /**
  * Frees heap-allocated memory for a command arguments structure.
  */
-int8_t CmdArgs_free(void* args);
+void CmdArgs_free(void* args);
+
+/**
+ * Frees heap-allocated memory for a message buffer structure.
+ */
+void CmdMsgBuf_free(char* msgBuf);
 
 #endif

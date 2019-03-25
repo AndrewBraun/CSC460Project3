@@ -6,7 +6,9 @@
 #include "uart/uart.h"
 #include "message/message.h"
 
-int main() {
+#if 0
+void Test_MessageEncode()
+{
 	uart_init(UART_19200);
 
 	CmdMoveRoombaArgs_t args;
@@ -27,4 +29,24 @@ int main() {
 		uart_putchar(msgBuf[i]);
 
 	while (1);
+}
+#endif
+
+int main() {
+	uart_init(UART_19200);
+	CmdMoveRoombaArgs_t inArgs = { .wheelLeft = 127, .wheelRight = -127 };
+
+	char *msg;
+	int len = CmdMoveRoomba_encode(&msg, &inArgs);
+
+	uart_putchar(inArgs.wheelLeft);
+	uart_putchar(inArgs.wheelRight);
+
+	CmdMoveRoombaArgs_t *args = CmdMoveRoomba_decode(msg);
+	uart_putchar(args->wheelLeft);
+	uart_putchar(args->wheelRight);
+
+	CmdArgs_free(args);
+
+	while(1);
 }

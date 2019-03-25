@@ -20,6 +20,16 @@ int8_t CmdMoveRoomba_encode(char **msgBuf /*out*/, CmdMoveRoombaArgs_t const* ar
     return sizeof(CmdMoveRoombaArgs_t) + 1;
 }
 
+CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf)
+{
+    CmdMoveRoombaArgs_t *moveArgs = malloc(sizeof(CmdMoveRoombaArgs_t));
+
+    moveArgs->wheelLeft = (msgBuf[1] << 8 | msgBuf[2]);
+    moveArgs->wheelRight = (msgBuf[3] << 8 | msgBuf[4]);
+
+    return moveArgs;
+}
+
 
 int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out*/)
 {
@@ -28,13 +38,15 @@ int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out
     {
         case Cmd_MoveRoomba:
         {
-            CmdMoveRoombaArgs_t *moveArgs = malloc(sizeof(CmdMoveRoombaArgs_t));
+            
+            uint8_t bufSize = sizeof(CmdMoveRoombaArgs_t) + 1;
+            char msgBuf[bufSize];
+            while (uart_bytes_received() < bufSize);
 
-            while (uart_bytes_received() < sizeof(CmdMoveRoombaArgs_t) + 1);
-            moveArgs->wheelLeft = (uart_get_byte(1) << 8 | uart_get_byte(2));
-            moveArgs->wheelRight = (uart_get_byte(3) << 8 | uart_get_byte(4));
+            for (int i = 0; i < bufSize; i++)
+                msgBuf[i] = uart_get_byte(i);
 
-            *args = moveArgs;
+            *args = (void*) CmdMoveRoomba_decode(msgBuf);
             break;
         }
         default:
@@ -47,3 +59,12 @@ int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out
     return 0;
 }
 
+void CmdArgs_free(void *args)
+{
+    free(args);
+}
+
+void CmdMsgBuf_free(char* msgBuf)
+{
+    free(msgBuf);
+}
