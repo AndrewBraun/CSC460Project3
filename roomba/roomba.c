@@ -14,9 +14,9 @@
 #define LOW_BYTE(v)   ((unsigned char) (v))
 #define HIGH_BYTE(v)  ((unsigned char) (((unsigned int) (v)) >> 8))
 
-#define DD_DDR DDRE
-#define DD_PORT PORTE
-#define DD_PIN PE4
+#define DD_DDR DDRC
+#define DD_PORT PORTC
+#define DD_PIN PC5
 
 STATUS_LED_STATE status = LED_OFF;
 LED_STATE spot = LED_OFF;
@@ -53,7 +53,7 @@ void Roomba_Init()
 	uart_init(UART_19200);
 
 	// start the Roomba's SCI
-	uart_putchar(START);
+	uart_putchar_0(START);
 	_delay_ms(20);
 
 	// See the appropriate AVR hardware specification, at the end of the USART section, for a table of baud rate
@@ -62,15 +62,15 @@ void Roomba_Init()
 	// that.  38400 at 0.2% is sufficient for our purposes.  An 18.432 MHz crystal will generate all the Roomba's
 	// baud rates with 0.0% error!.  Anyway, the point is we want to use a 38400 bps baud rate to avoid framing
 	// errors.  Also, we have to wait for 100 ms after changing the baud rate.
-	uart_putchar(BAUD);
-	uart_putchar(ROOMBA_38400BPS);
+	uart_putchar_0(BAUD);
+	uart_putchar_0(ROOMBA_38400BPS);
 	_delay_ms(100);
 
 	// change the AVR's UART clock to the new baud rate.
 	uart_init(UART_38400);
 
 	// put the Roomba into safe mode.
-	uart_putchar(CONTROL);
+	uart_putchar_0(CONTROL);
 	_delay_ms(20);
 
 	// Set the Roomba's LEDs to the defaults defined above (to verify defaults).
@@ -98,8 +98,8 @@ uint8_t wait_for_bytes(uint8_t num_bytes, uint8_t timeout)
 void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* sensor_packet)
 {
 	// No, I don't feel bad about manual loop unrolling.
-	uart_putchar(SENSORS);
-	uart_putchar(group);
+	uart_putchar_0(SENSORS);
+	uart_putchar_0(group);
 	switch(group)
 	{
 	case EXTERNAL:
@@ -150,18 +150,18 @@ void Roomba_ChangeState(ROOMBA_STATE newState)
 	if (newState == SAFE_MODE)
 	{
 		if (state == PASSIVE_MODE)
-			uart_putchar(CONTROL);
+			uart_putchar_0(CONTROL);
 		else if (state == FULL_MODE)
-			uart_putchar(SAFE);
+			uart_putchar_0(SAFE);
 	}
 	else if (newState == FULL_MODE)
 	{
 		Roomba_ChangeState(SAFE_MODE);
-		uart_putchar(FULL);
+		uart_putchar_0(FULL);
 	}
 	else if (newState == PASSIVE_MODE)
 	{
-		uart_putchar(POWER);
+		uart_putchar_0(POWER);
 	}
 	else
 	{
@@ -175,11 +175,11 @@ void Roomba_ChangeState(ROOMBA_STATE newState)
 
 void Roomba_Drive( int16_t velocity, int16_t radius )
 {
-	uart_putchar(DRIVE);
-	uart_putchar(HIGH_BYTE(velocity));
-	uart_putchar(LOW_BYTE(velocity));
-	uart_putchar(HIGH_BYTE(radius));
-	uart_putchar(LOW_BYTE(radius));
+	uart_putchar_0(DRIVE);
+	uart_putchar_0(HIGH_BYTE(velocity));
+	uart_putchar_0(LOW_BYTE(velocity));
+	uart_putchar_0(HIGH_BYTE(radius));
+	uart_putchar_0(LOW_BYTE(radius));
 }
 
 /**
@@ -190,10 +190,10 @@ void update_leds()
 	// The status, spot, clean, max, and dirt detect LED states are combined in a single byte.
 	uint8_t leds = status << 4 | spot << 3 | clean << 2 | max << 1 | dd;
 
-	uart_putchar(LEDS);
-	uart_putchar(leds);
-	uart_putchar(power_colour);
-	uart_putchar(power_intensity);
+	uart_putchar_0(LEDS);
+	uart_putchar_0(leds);
+	uart_putchar_0(power_colour);
+	uart_putchar_0(power_intensity);
 }
 
 void Roomba_ConfigPowerLED(uint8_t colour, uint8_t intensity)
@@ -237,21 +237,21 @@ void Roomba_LoadSong(uint8_t songNum, uint8_t* notes, uint8_t* notelengths, uint
 {
 	uint8_t i = 0;
 
-	uart_putchar(SONG);
-	uart_putchar(songNum);
-	uart_putchar(numNotes);
+	uart_putchar_0(SONG);
+	uart_putchar_0(songNum);
+	uart_putchar_0(numNotes);
 
 	for (i=0; i<numNotes; i++)
 	{
-		uart_putchar(notes[i]);
-		uart_putchar(notelengths[i]);
+		uart_putchar_0(notes[i]);
+		uart_putchar_0(notelengths[i]);
 	}
 }
 
 void Roomba_PlaySong(int songNum)
 {
-	uart_putchar(PLAY);
-	uart_putchar(songNum);
+	uart_putchar_0(PLAY);
+	uart_putchar_0(songNum);
 }
 
 uint8_t Roomba_BumperActivated(roomba_sensor_data_t* sensor_data)
