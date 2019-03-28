@@ -12,9 +12,11 @@
 
 #include <avr/interrupt.h>
 #include <stdint.h>
+#define F_CPU 8000000UL
 
 typedef enum _uart_bps
 {
+	UART_9600,
 	UART_19200,
 	UART_38400,
 	UART_57600,
@@ -24,9 +26,10 @@ typedef enum _uart_bps
 #define UART_BUFFER_SIZE    32
 
 void uart_init(UART_BPS bitrate);
-void uart_putchar(uint8_t byte);
+void uart_putchar_0(uint8_t byte);
+void uart_putchar_1(uint8_t byte);
 uint8_t uart_get_byte(int index);
 uint8_t uart_bytes_received(void);
 void uart_reset_receive(void);
-
+void uart_print(uint8_t* output, int size);
 #endif
