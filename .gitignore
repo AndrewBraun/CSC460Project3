@@ -2,3 +2,6 @@
 *.o
 *.elf
 *.hex
+
+# Visual studio code files
+.vscode/
