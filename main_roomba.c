@@ -55,28 +55,35 @@ void Test_MessageDecode()
 }
 #endif
 
+void HandleCmd_MoveRoomba(CmdMoveRoombaArgs_t* args)
+{
+	uart_putchar_0((uint8_t) args->wheelLeft);
+	uart_putchar_0((uint8_t) (args->wheelLeft >> 8));
+}
+
 void Task_PollBluetooth(void* args)
 {
 	DDRB = 0xFF;
-	PORTB = 0xFF;
 
 	// Bluetooth should be on UART 1
 	if (uart_bytes_received_1() > 0)
 	{
+		PORTB = 0xFF;
 
-		for (int i = 0; i < uart_bytes_received_1(); i++)
-			uart_putchar_0(uart_get_byte_1(i));
+		// Decode next command from UART 1. This may dispatch a sporadic task
+		// to handle the new message.
+		Cmd_decodenext();
 
-		// Clear UART buffer
-		uart_reset_receive_1();
+		PORTB = 0x00;
 	}
 
-	PORTB = 0x00;
 }
 
 int main() 
 {
 	uart_init(UART_9600);
+
+	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;
 
 	Scheduler_Init();
 	Scheduler_StartPeriodicTask(0, 100, Task_PollBluetooth, NULL);

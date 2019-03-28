@@ -7,6 +7,8 @@
 
 #include "message.h"
 
+MessageHandlerVect g_messageHandlers;
+
 int8_t CmdMoveRoomba_encode(char **msgBuf /*out*/, CmdMoveRoombaArgs_t const* args)
 {
     *msgBuf = malloc(sizeof(CmdMoveRoombaArgs_t) + 1);  // arguments + opcode
@@ -31,22 +33,27 @@ CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf)
 }
 
 
-int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out*/)
+int8_t Cmd_decodenext()
 {
-    *opcode = uart_get_byte_1(0);
-    switch (*opcode)
+    int opcode = uart_get_byte_1(0);
+    switch (opcode)
     {
         case Cmd_MoveRoomba:
         {
-            
             uint8_t bufSize = sizeof(CmdMoveRoombaArgs_t) + 1;
             char msgBuf[bufSize];
-            while (uart_bytes_received_1() < bufSize);
+
+            if (uart_bytes_received_1() < bufSize)
+                return 1;  // Not enough bytes recieved. Must wait!
 
             for (int i = 0; i < bufSize; i++)
                 msgBuf[i] = uart_get_byte_1(i);
 
-            *args = (void*) CmdMoveRoomba_decode(msgBuf);
+            CmdMoveRoombaArgs_t* args = CmdMoveRoomba_decode(msgBuf);
+            uart_reset_receive_1();
+
+            if (g_messageHandlers.HandleCmd_MoveRoomba)
+                (*g_messageHandlers.HandleCmd_MoveRoomba)(args);
             break;
         }
         default:

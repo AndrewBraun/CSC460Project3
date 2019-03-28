@@ -30,12 +30,10 @@ CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf);
  */
 
 /**
- * Decodes a message from a string buffer.
- * @param msgBuf: Incoming message buffer
- * @param opcode [out]: Opcode of the incoming message
- * @param args [out]: Any arguments associated with the incoming command
+ * Decodes the next incoming message from Bluetooth (UART 1).
+ * If the message was successfully decoded, dispatches a sporadic message handler task.
  */
-int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out*/);
+int8_t Cmd_decodenext();
 
 /**
  * Frees heap-allocated memory for a command arguments structure.
@@ -46,5 +44,14 @@ void CmdArgs_free(void* args);
  * Frees heap-allocated memory for a message buffer structure.
  */
 void CmdMsgBuf_free(char* msgBuf);
+
+/**
+ * Message handler functions
+ */
+typedef struct {
+    void (*HandleCmd_MoveRoomba)(CmdMoveRoombaArgs_t*);     // Move Roomba handler
+} MessageHandlerVect;
+
+extern MessageHandlerVect g_messageHandlers;
 
 #endif
