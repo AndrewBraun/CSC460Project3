@@ -29,8 +29,11 @@ typedef enum _uart_bps
 void uart_init(UART_BPS bitrate);
 void uart_putchar_0(uint8_t byte);
 void uart_putchar_1(uint8_t byte);
-uint8_t uart_get_byte(int index);
-uint8_t uart_bytes_received(void);
-void uart_reset_receive(void);
+uint8_t uart_get_byte_0(int index);
+uint8_t uart_get_byte_1(int index);
+uint8_t uart_bytes_received_0(void);
+uint8_t uart_bytes_received_1(void);
+void uart_reset_receive_0(void);
+void uart_reset_receive_1(void);
 void uart_print(uint8_t* output, int size);
 #endif
