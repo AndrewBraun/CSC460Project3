@@ -112,21 +112,25 @@ void uart_init(uint8_t uart_id, UART_BPS bitrate){
  *
  * @param byte data to trasmit
  */
-void uart_putchar_0(uint8_t byte)
+void uart_putchar(uint8_t uart_id, uint8_t byte)
 {
-    /* wait for empty transmit buffer */
-    while (!( UCSR0A & (1 << UDRE0)));
+	switch (uart_id)
+	{
+	case UART_0:
+		/* wait for empty transmit buffer */
+		while (!( UCSR0A & (1 << UDRE0)));
 
-    /* Put data into buffer, sends the data */
-    UDR0 = byte;
-}
+		/* Put data into buffer, sends the data */
+		UDR0 = byte;
+		break;
+	case UART_1:
+		/* wait for empty transmit buffer */
+		while (!( UCSR1A & (1 << UDRE1)));
 
-void uart_putchar_1(uint8_t byte){
-	/* wait for empty transmit buffer */
-	while (!( UCSR1A & (1 << UDRE1)));
-
-	/* Put data into buffer, sends the data */
-	UDR1 = byte;
+		/* Put data into buffer, sends the data */
+		UDR1 = byte;
+		break;
+	}
 }
 
 /**
@@ -136,20 +140,22 @@ void uart_putchar_1(uint8_t byte){
  *
  * @return
  */
-uint8_t uart_get_byte_0(int index)
+uint8_t uart_get_byte(uint8_t uart_id, int index)
 {
-    if (index < UART_BUFFER_SIZE)
-    {
-        return uart_buffer_0[index];
-    }
-    return 0;
-}
-
-uint8_t uart_get_byte_1(int index){
-	if (index < UART_BUFFER_SIZE){
-		return uart_buffer_1[index];
+	switch (uart_id)
+	{
+	case UART_0:
+		if (index < UART_BUFFER_SIZE)
+		{
+			return uart_buffer_0[index];
+		}
+		return 0;
+	case UART_1:
+		if (index < UART_BUFFER_SIZE){
+			return uart_buffer_1[index];
+		}
+		return 0;
 	}
-	return 0;
 }
 
 /**
@@ -157,25 +163,29 @@ uint8_t uart_get_byte_1(int index){
  *
  * @return number of bytes received on UART
  */
-uint8_t uart_bytes_received_0(void)
+uint8_t uart_bytes_received(uint8_t uart_id)
 {
-    return uart_buffer_index_0;
-}
-
-uint8_t uart_bytes_received_1(void){
-	return uart_buffer_index_1;	
+	switch(uart_id)
+	{
+	case UART_0:
+		return uart_buffer_index_0;
+	case UART_1:
+		return uart_buffer_index_1;	
+	}
 }
 
 /**
  * Prepares UART to receive another payload
- *
  */
-void uart_reset_receive_0(void){
-    uart_buffer_index_0 = 0;
-}
-
-void uart_reset_receive_1(void){
-	uart_buffer_index_1 = 0;
+void uart_reset_receive(uint8_t uart_id)
+{
+	switch (uart_id)
+	{
+	case UART_0:
+		uart_buffer_index_0 = 0;
+	case UART_1:
+		uart_buffer_index_1 = 0;
+	}
 }
 
 /**

@@ -29,11 +29,11 @@ void send_message_task(void* param_ptr){
 	DDRB = 0xFF;
 	PORTB = 0xFF;
 	
-	uart_putchar_1('T');
-	uart_putchar_1('e');
-	uart_putchar_1('s');
-	uart_putchar_1('t');
-	uart_putchar_1('\n');
+	uart_putchar(UART_1, 'T');
+	uart_putchar(UART_1, 'e');
+	uart_putchar(UART_1, 's');
+	uart_putchar(UART_1, 't');
+	uart_putchar(UART_1, '\n');
 	
 	PORTB = 0x00;
 }
@@ -45,7 +45,7 @@ which sets up and runs a test.
 int main() {
 	//joystick_init(&servo_joystick, 0x00, 0x01);
 	//joystick_init(&roomba_joystick, 0x04, 0x08);
-	uart_init(UART_9600);
+	uart_init(UART_1, UART_9600);
 	
 	Scheduler_Init();
 	

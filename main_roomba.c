@@ -58,8 +58,8 @@ void Test_MessageDecode()
 
 void HandleCmd_MoveRoomba(CmdMoveRoombaArgs_t* args)
 {
-	uart_putchar_0((uint8_t) args->wheelLeft);
-	uart_putchar_0((uint8_t) (args->wheelLeft >> 8));
+	uart_putchar(UART_0, (uint8_t) args->wheelLeft);
+	uart_putchar(UART_0, (uint8_t) (args->wheelLeft >> 8));
 }
 
 void Task_PollBluetooth(void* args)
@@ -67,7 +67,7 @@ void Task_PollBluetooth(void* args)
 	DDRB = 0xFF;
 
 	// Bluetooth should be on UART 1
-	if (uart_bytes_received_1() > 0)
+	if (uart_bytes_received(UART_1) > 0)
 	{
 		PORTB = 0xFF;
 

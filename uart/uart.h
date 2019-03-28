@@ -31,13 +31,9 @@ typedef enum _uart_bps
 #define UART_BUFFER_SIZE    32
 
 void uart_init(uint8_t uart_id, UART_BPS bitrate);
-void uart_putchar_0(uint8_t byte);
-void uart_putchar_1(uint8_t byte);
-uint8_t uart_get_byte_0(int index);
-uint8_t uart_get_byte_1(int index);
-uint8_t uart_bytes_received_0(void);
-uint8_t uart_bytes_received_1(void);
-void uart_reset_receive_0(void);
-void uart_reset_receive_1(void);
+void uart_putchar(uint8_t uart_id, uint8_t byte);
+uint8_t uart_get_byte(uint8_t uart_id, int index);
+uint8_t uart_bytes_received(uint8_t uart_id);
+void uart_reset_receive(uint8_t uart_id);
 void uart_print(uint8_t* output, int size);
 #endif

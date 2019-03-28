@@ -7,6 +7,8 @@
 
 #include "message.h"
 
+#define BLUETOOTH_UART UART_1
+
 MessageHandlerVect g_messageHandlers;
 
 int8_t CmdMoveRoomba_encode(char **msgBuf /*out*/, CmdMoveRoombaArgs_t const* args)
@@ -35,7 +37,7 @@ CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf)
 
 int8_t Cmd_decodenext()
 {
-    int opcode = uart_get_byte_1(0);
+    int opcode = uart_get_byte(BLUETOOTH_UART, 0);
     switch (opcode)
     {
         case Cmd_MoveRoomba:
@@ -43,14 +45,14 @@ int8_t Cmd_decodenext()
             uint8_t bufSize = sizeof(CmdMoveRoombaArgs_t) + 1;
             char msgBuf[bufSize];
 
-            if (uart_bytes_received_1() < bufSize)
+            if (uart_bytes_received(BLUETOOTH_UART) < bufSize)
                 return 1;  // Not enough bytes recieved. Must wait!
 
             for (int i = 0; i < bufSize; i++)
-                msgBuf[i] = uart_get_byte_1(i);
+                msgBuf[i] = uart_get_byte(BLUETOOTH_UART, i);
 
             CmdMoveRoombaArgs_t* args = CmdMoveRoomba_decode(msgBuf);
-            uart_reset_receive_1();
+            uart_reset_receive(UART_1);
 
             if (g_messageHandlers.HandleCmd_MoveRoomba)
                 (*g_messageHandlers.HandleCmd_MoveRoomba)(args);
@@ -62,7 +64,7 @@ int8_t Cmd_decodenext()
 
     }
 
-    uart_reset_receive_1();  // clear uart buffer
+    uart_reset_receive(BLUETOOTH_UART);  // clear uart buffer
     return 0;
 }
 
