@@ -104,44 +104,44 @@ void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* 
 	{
 	case EXTERNAL:
 		// environment sensors
-		while (uart_bytes_received() != 10);
-		sensor_packet->bumps_wheeldrops = uart_get_byte(0);
-		sensor_packet->wall = uart_get_byte(1);
-		sensor_packet->cliff_left = uart_get_byte(2);
-		sensor_packet->cliff_front_left = uart_get_byte(3);
-		sensor_packet->cliff_front_right = uart_get_byte(4);
-		sensor_packet->cliff_right = uart_get_byte(5);
-		sensor_packet->virtual_wall = uart_get_byte(6);
-		sensor_packet->motor_overcurrents = uart_get_byte(7);
-		sensor_packet->dirt_left = uart_get_byte(8);
-		sensor_packet->dirt_right = uart_get_byte(9);
+		while (uart_bytes_received_0() != 10);
+		sensor_packet->bumps_wheeldrops = uart_get_byte_0(0);
+		sensor_packet->wall = uart_get_byte_0(1);
+		sensor_packet->cliff_left = uart_get_byte_0(2);
+		sensor_packet->cliff_front_left = uart_get_byte_0(3);
+		sensor_packet->cliff_front_right = uart_get_byte_0(4);
+		sensor_packet->cliff_right = uart_get_byte_0(5);
+		sensor_packet->virtual_wall = uart_get_byte_0(6);
+		sensor_packet->motor_overcurrents = uart_get_byte_0(7);
+		sensor_packet->dirt_left = uart_get_byte_0(8);
+		sensor_packet->dirt_right = uart_get_byte_0(9);
 		break;
 	case CHASSIS:
 		// chassis sensors
-		while (uart_bytes_received() != 6);
-		sensor_packet->remote_opcode = uart_get_byte(0);
-		sensor_packet->buttons = uart_get_byte(1);
-		sensor_packet->distance.bytes.high_byte = uart_get_byte(2);
-		sensor_packet->distance.bytes.low_byte = uart_get_byte(3);
-		sensor_packet->angle.bytes.high_byte = uart_get_byte(4);
-		sensor_packet->angle.bytes.low_byte = uart_get_byte(5);
+		while (uart_bytes_received_0() != 6);
+		sensor_packet->remote_opcode = uart_get_byte_0(0);
+		sensor_packet->buttons = uart_get_byte_0(1);
+		sensor_packet->distance.bytes.high_byte = uart_get_byte_0(2);
+		sensor_packet->distance.bytes.low_byte = uart_get_byte_0(3);
+		sensor_packet->angle.bytes.high_byte = uart_get_byte_0(4);
+		sensor_packet->angle.bytes.low_byte = uart_get_byte_0(5);
 		break;
 	case INTERNAL:
 		// internal sensors
-		while (uart_bytes_received() != 10);
-		sensor_packet->charging_state = uart_get_byte(0);
-		sensor_packet->voltage.bytes.high_byte = uart_get_byte(1);
-		sensor_packet->voltage.bytes.low_byte = uart_get_byte(2);
-		sensor_packet->current.bytes.high_byte = uart_get_byte(3);
-		sensor_packet->current.bytes.low_byte = uart_get_byte(4);
-		sensor_packet->temperature = uart_get_byte(5);
-		sensor_packet->charge.bytes.high_byte = uart_get_byte(6);
-		sensor_packet->charge.bytes.low_byte = uart_get_byte(7);
-		sensor_packet->capacity.bytes.high_byte = uart_get_byte(8);
-		sensor_packet->capacity.bytes.low_byte = uart_get_byte(9);
+		while (uart_bytes_received_0() != 10);
+		sensor_packet->charging_state = uart_get_byte_0(0);
+		sensor_packet->voltage.bytes.high_byte = uart_get_byte_0(1);
+		sensor_packet->voltage.bytes.low_byte = uart_get_byte_0(2);
+		sensor_packet->current.bytes.high_byte = uart_get_byte_0(3);
+		sensor_packet->current.bytes.low_byte = uart_get_byte_0(4);
+		sensor_packet->temperature = uart_get_byte_0(5);
+		sensor_packet->charge.bytes.high_byte = uart_get_byte_0(6);
+		sensor_packet->charge.bytes.low_byte = uart_get_byte_0(7);
+		sensor_packet->capacity.bytes.high_byte = uart_get_byte_0(8);
+		sensor_packet->capacity.bytes.low_byte = uart_get_byte_0(9);
 		break;
 	}
-	uart_reset_receive();
+	uart_reset_receive_0();
 }
 
 
