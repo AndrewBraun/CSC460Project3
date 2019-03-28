@@ -33,7 +33,7 @@ CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf)
 
 int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out*/)
 {
-    *opcode = uart_get_byte(0);
+    *opcode = uart_get_byte_1(0);
     switch (*opcode)
     {
         case Cmd_MoveRoomba:
@@ -41,10 +41,10 @@ int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out
             
             uint8_t bufSize = sizeof(CmdMoveRoombaArgs_t) + 1;
             char msgBuf[bufSize];
-            while (uart_bytes_received() < bufSize);
+            while (uart_bytes_received_1() < bufSize);
 
             for (int i = 0; i < bufSize; i++)
-                msgBuf[i] = uart_get_byte(i);
+                msgBuf[i] = uart_get_byte_1(i);
 
             *args = (void*) CmdMoveRoomba_decode(msgBuf);
             break;
@@ -55,7 +55,7 @@ int8_t Cmd_decode(char const* msgBuf, uint8_t *opcode /*out*/, void **args /*out
 
     }
 
-    uart_reset_receive();  // clear uart buffer
+    uart_reset_receive_1();  // clear uart buffer
     return 0;
 }
 

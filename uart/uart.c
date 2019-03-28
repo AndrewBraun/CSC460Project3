@@ -26,8 +26,11 @@ static volatile uint8_t uart_buffer_index_1;
  */
 void uart_init(UART_BPS bitrate){
 	//UCSR1A = (1 << U2X1);
-	UCSR1B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+	UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE0);
 	UCSR1C = (1 << UCSZ01) | (1 << UCSZ00);
+
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 
 	UBRR0H = 0;	// for any speed >= 9600 bps, the UBBR value fits in the low byte.
 	UBRR1H = 0;
@@ -145,7 +148,7 @@ uint8_t uart_get_byte_0(int index)
 
 uint8_t uart_get_byte_1(int index){
 	if (index < UART_BUFFER_SIZE){
-		return uart_buffer_0[index];
+		return uart_buffer_1[index];
 	}
 	return 0;
 }
