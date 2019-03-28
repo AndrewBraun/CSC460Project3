@@ -8,8 +8,6 @@
  */
 #include "uart.h"
 
-#define F_CPU 8000000UL
-
 #ifndef F_CPU
 #warning "F_CPU not defined for uart.c."
 #define F_CPU 11059200UL
@@ -167,5 +165,15 @@ ISR(USART0_RX_vect)
 {
 	while(!(UCSR0A & (1<<RXC0)));
     uart_buffer[uart_buffer_index] = UDR0;
+    uart_buffer_index = (uart_buffer_index + 1) % UART_BUFFER_SIZE;
+}
+
+/**
+ * UART receive byte ISR
+ */
+ISR(USART1_RX_vect)
+{
+	while(!(UCSR1A & (1<<RXC1)));
+    uart_buffer[uart_buffer_index] = UDR1;
     uart_buffer_index = (uart_buffer_index + 1) % UART_BUFFER_SIZE;
 }
