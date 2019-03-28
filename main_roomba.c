@@ -5,6 +5,7 @@
 
 #include "uart/uart.h"
 #include "message/message.h"
+#include "roomba/roomba.h"
 #include "tta.h"
 
 #include <stddef.h>
@@ -81,7 +82,8 @@ void Task_PollBluetooth(void* args)
 
 int main() 
 {
-	uart_init(UART_9600);
+	uart_init(UART_0, UART_9600);
+	uart_init(UART_1, UART_9600);
 
 	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;
 

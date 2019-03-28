@@ -15,6 +15,7 @@
 #define F_CPU 11059200UL
 #endif
 
+// UART receive buffers
 static volatile uint8_t uart_buffer_0[UART_BUFFER_SIZE];
 static volatile uint8_t uart_buffer_1[UART_BUFFER_SIZE];
 static volatile uint8_t uart_buffer_index_0;
@@ -24,16 +25,8 @@ static volatile uint8_t uart_buffer_index_1;
  * Initalize UART
  *
  */
-void uart_init(UART_BPS bitrate){
-	//UCSR1A = (1 << U2X1);
-	UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE0);
-	UCSR1C = (1 << UCSZ01) | (1 << UCSZ00);
-
-	UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
-	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
-
-	UBRR0H = 0;	// for any speed >= 9600 bps, the UBBR value fits in the low byte.
-	UBRR1H = 0;
+void uart_init(uint8_t uart_id, UART_BPS bitrate){
+	uint8_t brLow, brHigh;
 
 	// See the appropriate AVR hardware specification for a table of UBBR values at different
 	// clock speeds.
@@ -41,66 +34,72 @@ void uart_init(UART_BPS bitrate){
 	{
 #if F_CPU==8000000UL
 	case UART_9600:
-		UBRR0L = 104;
-		UBRR1L = 208;
+		brLow = 104;
+		break;
 	case UART_19200:
-		UBRR0L = 51;
-		UBRR1L = 102;
+		brLow = 51;
 		break;
 	case UART_38400:
-		UBRR0L = 25;
-		UBRR1L = 50;
+		brLow = 25;
 		break;
 	case UART_57600:
-		UBRR0L = 16;
-		UBRR1L = 32;
+		brLow = 16;
 		break;
 	default:
-		UBRR0L = 51;
-		UBRR1L = 102;
+		brLow = 51;
 #elif F_CPU==16000000UL
 	case UART_9600:
-		UBRR0L = 208;
-		UBRR1L = 208;
+		brLow = 208;
 	case UART_19200:
-		UBRR0L = 103;
-		UBRR1L = 103;
+		brLow = 103;
 		break;
 	case UART_38400:
-		UBRR0L = 51;
-		UBRR1L = 102;
+		brLow = 51;
 		break;
 	case UART_57600:
-		UBRR0L = 34;
-		UBRR1L = 68;
+		brLow = 34;
 		break;
 	default:
-		UBRR0L = 103;
-		UBRR1L = 206;
+		brLow = 103;
 #elif F_CPU==18432000UL
 	case UART_19200:
-		UBRR0L = 119;
-		UBRR1L = 238;
+		brLow = 119;
 		break;
 	case UART_38400:
-		UBRR0L = 59;
-		UBRR1L = 118;
+		brLow = 59;
 		break;
 	case UART_57600:
-		UBRR0L = 39;
-		UBRR1L = 78;
+		brLow = 39;
 		break;
 	default:
-		UBRR0L = 119;
-		UBRR1L = 238;
+		brLow = 119;
 		break;
 #else
 #warning "F_CPU undefined or not supported in uart.c."
 	default:
-		UBRR0L = 71;
-		UBRR1L = 142;
+		brLow = 71;
 		break;
 #endif
+	}
+
+	switch (uart_id)
+	{
+	case UART_0:
+		// Enable Tx/Rx, set data frame options
+		UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+		UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+
+		// Set registers according to calculated baud rate
+		UBRR0L = brLow;  // for any speed >= 9600 bps, the UBBR value fits in the low byte.
+		UBRR0H = 0;
+		break;
+	case UART_1:
+		UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE0);
+		UCSR1C = (1 << UCSZ01) | (1 << UCSZ00);
+
+		UBRR1L = brLow;
+		UBRR0H = brHigh;
+		break;
 	}
 
     uart_buffer_index_0 = 0;

@@ -15,6 +15,10 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 
+// UART IDs
+#define UART_0 0
+#define UART_1 1
+
 typedef enum _uart_bps
 {
 	UART_9600,
@@ -26,7 +30,7 @@ typedef enum _uart_bps
 
 #define UART_BUFFER_SIZE    32
 
-void uart_init(UART_BPS bitrate);
+void uart_init(uint8_t uart_id, UART_BPS bitrate);
 void uart_putchar_0(uint8_t byte);
 void uart_putchar_1(uint8_t byte);
 uint8_t uart_get_byte_0(int index);
