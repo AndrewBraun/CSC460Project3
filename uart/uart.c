@@ -8,20 +8,23 @@
  */
 #include "uart.h"
 
+#define F_CPU 16000000UL
+
 #ifndef F_CPU
 #warning "F_CPU not defined for uart.c."
 #define F_CPU 11059200UL
 #endif
 
-static volatile uint8_t uart_buffer[UART_BUFFER_SIZE];
-static volatile uint8_t uart_buffer_index;
+static volatile uint8_t uart_buffer_0[UART_BUFFER_SIZE];
+static volatile uint8_t uart_buffer_1[UART_BUFFER_SIZE];
+static volatile uint8_t uart_buffer_index_0;
+static volatile uint8_t uart_buffer_index_1;
 
 /**
  * Initalize UART
  *
  */
-void uart_init(UART_BPS bitrate)
-{
+void uart_init(UART_BPS bitrate){
 	//UCSR1A = (1 << U2X1);
 	UCSR1B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
 	UCSR1C = (1 << UCSZ01) | (1 << UCSZ00);
@@ -55,10 +58,10 @@ void uart_init(UART_BPS bitrate)
 #elif F_CPU==16000000UL
 	case UART_9600:
 		UBRR0L = 208;
-		UBRR1L = 416;
+		UBRR1L = 208;
 	case UART_19200:
 		UBRR0L = 103;
-		UBRR1L = 206;
+		UBRR1L = 103;
 		break;
 	case UART_38400:
 		UBRR0L = 51;
@@ -97,7 +100,8 @@ void uart_init(UART_BPS bitrate)
 #endif
 	}
 
-    uart_buffer_index = 0;
+    uart_buffer_index_0 = 0;
+	uart_buffer_index_1 = 0;
 }
 
 /**
@@ -130,13 +134,20 @@ void uart_putchar_1(uint8_t byte){
  *
  * @return
  */
-uint8_t uart_get_byte(int index)
+uint8_t uart_get_byte_0(int index)
 {
     if (index < UART_BUFFER_SIZE)
     {
-        return uart_buffer[index];
+        return uart_buffer_0[index];
     }
     return 0;
+}
+
+uint8_t uart_get_byte_1(int index){
+	if (index < UART_BUFFER_SIZE){
+		return uart_buffer_0[index];
+	}
+	return 0;
 }
 
 /**
@@ -144,18 +155,25 @@ uint8_t uart_get_byte(int index)
  *
  * @return number of bytes received on UART
  */
-uint8_t uart_bytes_received(void)
+uint8_t uart_bytes_received_0(void)
 {
-    return uart_buffer_index;
+    return uart_buffer_index_0;
+}
+
+uint8_t uart_bytes_received_1(void){
+	return uart_buffer_index_1;	
 }
 
 /**
  * Prepares UART to receive another payload
  *
  */
-void uart_reset_receive(void)
-{
-    uart_buffer_index = 0;
+void uart_reset_receive_0(void){
+    uart_buffer_index_0 = 0;
+}
+
+void uart_reset_receive_1(void){
+	uart_buffer_index_1 = 0;
 }
 
 /**
@@ -164,16 +182,12 @@ void uart_reset_receive(void)
 ISR(USART0_RX_vect)
 {
 	while(!(UCSR0A & (1<<RXC0)));
-    uart_buffer[uart_buffer_index] = UDR0;
-    uart_buffer_index = (uart_buffer_index + 1) % UART_BUFFER_SIZE;
+    uart_buffer_0[uart_buffer_index_0] = UDR0;
+    uart_buffer_index_0 = (uart_buffer_index_0 + 1) % UART_BUFFER_SIZE;
 }
 
-/**
- * UART receive byte ISR
- */
-ISR(USART1_RX_vect)
-{
+ISR(USART1_RX_vect){
 	while(!(UCSR1A & (1<<RXC1)));
-    uart_buffer[uart_buffer_index] = UDR1;
-    uart_buffer_index = (uart_buffer_index + 1) % UART_BUFFER_SIZE;
+    uart_buffer_1[uart_buffer_index_1] = UDR1;
+    uart_buffer_index_1 = (uart_buffer_index_1 + 1) % UART_BUFFER_SIZE;
 }

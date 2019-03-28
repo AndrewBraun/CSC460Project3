@@ -45,7 +45,7 @@ which sets up and runs a test.
 int main() {
 	//joystick_init(&servo_joystick, 0x00, 0x01);
 	//joystick_init(&roomba_joystick, 0x04, 0x08);
-	uart_init(UART_19200);
+	uart_init(UART_9600);
 	
 	Scheduler_Init();
 	

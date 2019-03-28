@@ -10,6 +10,8 @@
 #ifndef __UART_H__
 #define __UART_H__
 
+#define F_CPU 16000000UL
+
 #include <avr/interrupt.h>
 #include <stdint.h>
 
