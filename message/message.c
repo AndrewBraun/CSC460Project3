@@ -16,10 +16,10 @@ int8_t CmdMoveRoomba_encode(char **msgBuf /*out*/, CmdMoveRoombaArgs_t const* ar
     *msgBuf = malloc(sizeof(CmdMoveRoombaArgs_t) + 1);  // arguments + opcode
 
     (*msgBuf)[0] = Cmd_MoveRoomba;                      // Byte 0: opcode
-    (*msgBuf)[1] = (uint8_t) (args->wheelLeft >> 8);    // Byte 1: high byte of wheel left
-    (*msgBuf)[2] = (uint8_t) (args->wheelLeft);         // Byte 2: low byte of wheel left
-    (*msgBuf)[3] = (uint8_t) (args->wheelRight >> 8);   // Byte 3: high byte of wheel left
-    (*msgBuf)[4] = (uint8_t) (args->wheelRight);        // Byte 4: low byte of wheel left
+    (*msgBuf)[1] = (uint8_t) (args->velocity >> 8);    // Byte 1: high byte of wheel left
+    (*msgBuf)[2] = (uint8_t) (args->velocity);         // Byte 2: low byte of wheel left
+    (*msgBuf)[3] = (uint8_t) (args->radius >> 8);   // Byte 3: high byte of wheel left
+    (*msgBuf)[4] = (uint8_t) (args->radius);        // Byte 4: low byte of wheel left
 
     return sizeof(CmdMoveRoombaArgs_t) + 1;
 }
@@ -28,8 +28,8 @@ CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf)
 {
     CmdMoveRoombaArgs_t *moveArgs = malloc(sizeof(CmdMoveRoombaArgs_t));
 
-    moveArgs->wheelLeft = (msgBuf[1] << 8 | msgBuf[2]);
-    moveArgs->wheelRight = (msgBuf[3] << 8 | msgBuf[4]);
+    moveArgs->velocity = (msgBuf[1] << 8 | msgBuf[2]);
+    moveArgs->radius = (msgBuf[3] << 8 | msgBuf[4]);
 
     return moveArgs;
 }

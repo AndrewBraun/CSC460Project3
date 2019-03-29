@@ -56,10 +56,18 @@ void Test_MessageDecode()
 }
 #endif
 
+struct {
+	uint16_t velocity;
+	uint16_t radius;
+} g_lastControllerArgs;
+
 void HandleCmd_MoveRoomba(CmdMoveRoombaArgs_t* args)
 {
-	uart_putchar(UART_0, (uint8_t) args->wheelLeft);
-	uart_putchar(UART_0, (uint8_t) (args->wheelLeft >> 8));
+	g_lastControllerArgs.velocity = args->velocity;
+	g_lastControllerArgs.radius = args->radius;
+
+	// Command handlers are responsible for freeing args!
+	CmdArgs_free(args);
 }
 
 void Task_PollBluetooth(void* args)
@@ -80,14 +88,26 @@ void Task_PollBluetooth(void* args)
 
 }
 
+void Task_UpdateRoombaSpeed(void* args)
+{
+	DDRB = 0xFF;
+	PORTB = 0xFF;
+
+	Roomba_Drive(g_lastControllerArgs.velocity, g_lastControllerArgs.radius);
+
+	PORTB = 0x00;
+}
+
 int main() 
 {
+	Roomba_Init();
 	uart_init(UART_0, UART_9600);
-	uart_init(UART_1, UART_9600);
+	g_lastControllerArgs.velocity = 300;
 
 	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;
 
 	Scheduler_Init();
-	Scheduler_StartPeriodicTask(0, 100, Task_PollBluetooth, NULL);
+	Scheduler_StartPeriodicTask(0,  100, Task_PollBluetooth,     NULL);
+	Scheduler_StartPeriodicTask(25, 100, Task_UpdateRoombaSpeed, NULL);
 	Scheduler_Start();
 }

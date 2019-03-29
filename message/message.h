@@ -18,8 +18,8 @@ typedef enum {
  */
 
 typedef struct {
-    int16_t wheelLeft;
-    int16_t wheelRight;
+    int16_t velocity;
+    int16_t radius;
 } CmdMoveRoombaArgs_t;
 
 int8_t CmdMoveRoomba_encode(char **msgBuf, CmdMoveRoombaArgs_t const* args);
