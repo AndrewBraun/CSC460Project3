@@ -5,6 +5,7 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 #include "tta.h"
 #include "joystick/joystick.h"
 #include "uart/uart.h"
@@ -29,18 +30,43 @@ void send_message_task(void* param_ptr){
 	
 	DDRB = 0xFF;
 	PORTB = 0xFF;
-	
-	//uart_putchar(UART_1, 'T');
-	//uart_putchar(UART_1, 'e');
-	//uart_putchar(UART_1, 's');
-	//uart_putchar(UART_1, 't');
-	//uart_putchar(UART_1, '\n');
+
 	uart_putchar(UART_1, servo_joystick.x_value);
 	uart_putchar(UART_1, servo_joystick.y_value);
 	uart_putchar(UART_1, roomba_joystick.x_value);
 	uart_putchar(UART_1, roomba_joystick.y_value);
 	
 	PORTB = 0x00;
+}
+
+void send_roomba_joystick_task(void* param_ptr){
+	DDRB = 0xFF;
+	PORTB = 0x00;
+	
+	CmdMoveRoombaArgs_t args;
+	
+	if (CurrentMode == CRUISE){
+		// Mode when the Roomba is allowed to move freely
+		args.radius = (((int16_t) (roomba_joystick.x_value)) - 127) * 15;
+	} else {
+		// Mode when the Roomba can only turn
+		// Gets the highest bit to get the clockwise/counterclockwise direction
+		args.radius = ((int16_t) (roomba_joystick.x_value - 127)) >> 7;
+	}
+	args.velocity = (((int16_t) (roomba_joystick.y_value)) - 127) * -7 / 2;
+	
+	char* msgBuf;
+	int len = CmdMoveRoomba_encode(&msgBuf, &args);
+
+	// Turn on a light if we get an error
+	if (len == -1){
+		PORTB = 0xFF;
+	}
+
+	for (int i = 0; i < len; i++)
+		uart_putchar(UART_1, msgBuf[i]);
+
+	free(msgBuf);
 }
 
 /*
@@ -54,11 +80,12 @@ int main() {
 	
 	Scheduler_Init();
 	
-	Scheduler_StartPeriodicTask(0, 25, read_joystick_task, &servo_joystick);
-	Scheduler_StartPeriodicTask(5, 25, read_joystick_task, &roomba_joystick);
-	Scheduler_StartPeriodicTask(10, 25, send_message_task, NULL);
-	
-	//Scheduler_StartPeriodicTask(30000,30000,switch_mode_task,NULL);
+	Scheduler_StartPeriodicTask(1, 25, read_joystick_task, &servo_joystick);
+	Scheduler_StartPeriodicTask(6, 25, read_joystick_task, &roomba_joystick);
+	Scheduler_StartPeriodicTask(12, 50, send_roomba_joystick_task, NULL);
+	//Scheduler_StartPeriodicTask(10, 25, send_message_task, NULL);
+
+	Scheduler_StartPeriodicTask(30000,30000,switch_mode_task,NULL);
 	
 	Scheduler_Start();
 }
