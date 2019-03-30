@@ -15,7 +15,7 @@
 #define HIGH_BYTE(v)  ((unsigned char) (((unsigned int) (v)) >> 8))
 
 // Connect DD port to digital port 2
-#define DD_DDR DDRC
+#define DD_DDR DDRE
 #define DD_PORT PORTE
 #define DD_PIN PE4
 
