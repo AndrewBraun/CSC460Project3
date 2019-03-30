@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "tta.h"
 #include "joystick/joystick.h"
 #include "uart/uart.h"
@@ -23,7 +24,12 @@ static MOVEMENT_MODE CurrentMode;
 Joystick servo_joystick, roomba_joystick;
 
 void switch_mode_task(void* param_ptr){
+	DDRB = 0xFF;
+	PORTB = 0xFF;
+	
 	CurrentMode = (CurrentMode+1) % 2;
+	
+	PORTB = 0x00;
 }
 
 void send_message_task(void* param_ptr){
@@ -51,7 +57,7 @@ void send_roomba_joystick_task(void* param_ptr){
 	} else {
 		// Mode when the Roomba can only turn
 		// Gets the highest bit to get the clockwise/counterclockwise direction
-		args.radius = ((int16_t) (roomba_joystick.x_value - 127)) >> 7;
+		args.radius = pow(-1, ((int16_t) (roomba_joystick.x_value - 127)) >> 15);
 	}
 	args.velocity = (((int16_t) (roomba_joystick.y_value)) - 127) * -7 / 2;
 	
@@ -82,7 +88,7 @@ int main() {
 	
 	Scheduler_StartPeriodicTask(1, 25, read_joystick_task, &servo_joystick);
 	Scheduler_StartPeriodicTask(6, 25, read_joystick_task, &roomba_joystick);
-	Scheduler_StartPeriodicTask(12, 50, send_roomba_joystick_task, NULL);
+	Scheduler_StartPeriodicTask(12, 100, send_roomba_joystick_task, NULL);
 	//Scheduler_StartPeriodicTask(10, 25, send_message_task, NULL);
 
 	Scheduler_StartPeriodicTask(30000,30000,switch_mode_task,NULL);
