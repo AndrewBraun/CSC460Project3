@@ -31,6 +31,11 @@ void read_joystick_task(void* joystick_arg){
 	ADCSRA |= (1 << ADSC); // Start conversion
 	while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
 	
+	// We throw away the first reading to prevent a glitch in which
+	// the reading from the other joystick is used for this one.
+	ADCSRA |= (1 << ADSC); // Start conversion
+	while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
+	
 	joystick->x_value = (1 - JOYSTICK_ALPHA) * ADCH + JOYSTICK_ALPHA * joystick->x_value;
 	
 	ADMUX = (1 << REFS0) | (1 << ADLAR) | joystick->y_pin; // Sets ADC to look at y pin.
