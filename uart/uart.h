@@ -18,6 +18,7 @@
 // UART IDs
 #define UART_0 0
 #define UART_1 1
+#define UART_2 2
 
 typedef enum _uart_bps
 {

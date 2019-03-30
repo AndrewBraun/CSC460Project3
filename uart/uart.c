@@ -13,8 +13,10 @@
 // UART receive buffers
 static volatile uint8_t uart_buffer_0[UART_BUFFER_SIZE];
 static volatile uint8_t uart_buffer_1[UART_BUFFER_SIZE];
+static volatile uint8_t uart_buffer_2[UART_BUFFER_SIZE];
 static volatile uint8_t uart_buffer_index_0;
 static volatile uint8_t uart_buffer_index_1;
+static volatile uint8_t uart_buffer_index_2;
 
 /**
  * Initalize UART
@@ -98,10 +100,19 @@ void uart_init(uint8_t uart_id, UART_BPS bitrate){
 		UBRR1L = brLow;
 		UBRR1H = 0;
 		break;
+	case UART_2:
+		UCSR2A = (1 << U2X2);
+		UCSR2B = (1 << RXEN2) | (1 << TXEN2) | (1 << RXCIE2);
+		UCSR2C = (1 << UCSZ21) | (1 << UCSZ20);
+
+		UBRR2L = brLow;
+		UBRR2H = 0;
+		break;
 	}
 
     uart_buffer_index_0 = 0;
 	uart_buffer_index_1 = 0;
+	uart_buffer_index_2 = 0;
 }
 
 /**
@@ -128,6 +139,13 @@ void uart_putchar(uint8_t uart_id, uint8_t byte)
 		/* Put data into buffer, sends the data */
 		UDR1 = byte;
 		break;
+	case UART_2:
+		/* wait for empty transmit buffer */
+		while (!( UCSR2A & (1 << UDRE2)));
+
+		/* Put data into buffer, sends the data */
+		UDR2 = byte;
+		break;
 	}
 }
 
@@ -153,6 +171,11 @@ uint8_t uart_get_byte(uint8_t uart_id, int index)
 			return uart_buffer_1[index];
 		}
 		return 0;
+	case UART_2:
+		if (index < UART_BUFFER_SIZE){
+			return uart_buffer_2[index];
+		}
+		return 0;
 	}
 }
 
@@ -169,6 +192,8 @@ uint8_t uart_bytes_received(uint8_t uart_id)
 		return uart_buffer_index_0;
 	case UART_1:
 		return uart_buffer_index_1;	
+	case UART_2:
+		return uart_buffer_index_2;
 	}
 }
 
@@ -183,6 +208,8 @@ void uart_reset_receive(uint8_t uart_id)
 		uart_buffer_index_0 = 0;
 	case UART_1:
 		uart_buffer_index_1 = 0;
+	case UART_2:
+		uart_buffer_index_2 = 0;
 	}
 }
 
@@ -200,4 +227,10 @@ ISR(USART1_RX_vect){
 	while(!(UCSR1A & (1<<RXC1)));
     uart_buffer_1[uart_buffer_index_1] = UDR1;
     uart_buffer_index_1 = (uart_buffer_index_1 + 1) % UART_BUFFER_SIZE;
+}
+
+ISR(USART2_RX_vect){
+	while(!(UCSR2A & (1<<RXC2)));
+    uart_buffer_2[uart_buffer_index_2] = UDR2;
+    uart_buffer_index_2 = (uart_buffer_index_2 + 1) % UART_BUFFER_SIZE;
 }

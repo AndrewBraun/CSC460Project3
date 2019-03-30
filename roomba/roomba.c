@@ -19,7 +19,7 @@
 #define DD_PORT PORTE
 #define DD_PIN PE4
 
-#define ROOMBA_UART UART_0
+#define ROOMBA_UART UART_2
 
 STATUS_LED_STATE status = LED_OFF;
 LED_STATE spot = LED_OFF;
