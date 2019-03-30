@@ -10,11 +10,6 @@
 
 #define F_CPU 16000000UL
 
-#ifndef F_CPU
-#warning "F_CPU not defined for uart.c."
-#define F_CPU 11059200UL
-#endif
-
 // UART receive buffers
 static volatile uint8_t uart_buffer_0[UART_BUFFER_SIZE];
 static volatile uint8_t uart_buffer_1[UART_BUFFER_SIZE];
@@ -26,7 +21,7 @@ static volatile uint8_t uart_buffer_index_1;
  *
  */
 void uart_init(uint8_t uart_id, UART_BPS bitrate){
-	uint8_t brLow, brHigh;
+	uint8_t brLow;
 
 	// See the appropriate AVR hardware specification for a table of UBBR values at different
 	// clock speeds.
@@ -50,6 +45,7 @@ void uart_init(uint8_t uart_id, UART_BPS bitrate){
 #elif F_CPU==16000000UL
 	case UART_9600:
 		brLow = 208;
+		break;
 	case UART_19200:
 		brLow = 103;
 		break;
@@ -86,6 +82,7 @@ void uart_init(uint8_t uart_id, UART_BPS bitrate){
 	{
 	case UART_0:
 		// Enable Tx/Rx, set data frame options
+		UCSR0A = (1 << U2X0);
 		UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
 		UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 
@@ -94,11 +91,12 @@ void uart_init(uint8_t uart_id, UART_BPS bitrate){
 		UBRR0H = 0;
 		break;
 	case UART_1:
-		UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE0);
-		UCSR1C = (1 << UCSZ01) | (1 << UCSZ00);
+		UCSR1A = (1 << U2X1);
+		UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);
+		UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);
 
 		UBRR1L = brLow;
-		UBRR0H = brHigh;
+		UBRR1H = 0;
 		break;
 	}
 
