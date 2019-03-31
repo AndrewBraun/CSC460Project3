@@ -52,7 +52,7 @@ int8_t Cmd_decodenext()
                 msgBuf[i] = uart_get_byte(BLUETOOTH_UART, i);
 
             CmdMoveRoombaArgs_t* args = CmdMoveRoomba_decode(msgBuf);
-            uart_reset_receive(UART_1);
+            uart_reset_receive(BLUETOOTH_UART);
 
             if (g_messageHandlers.HandleCmd_MoveRoomba)
                 (*g_messageHandlers.HandleCmd_MoveRoomba)(args);

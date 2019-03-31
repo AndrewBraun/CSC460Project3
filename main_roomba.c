@@ -37,18 +37,12 @@ void Test_MessageEncode()
 
 void Test_MessageDecode()
 {
-	uart_init(UART_9600);
-	CmdMoveRoombaArgs_t inArgs = { .wheelLeft = 127, .wheelRight = -127 };
+	uart_init(UART_0, UART_9600);
+	CmdMoveRoombaArgs_t inArgs = { .velocity = 1, .radius = 1 };
 
 	char *msg;
 	int len = CmdMoveRoomba_encode(&msg, &inArgs);
-
-	uart_putchar(inArgs.wheelLeft);
-	uart_putchar(inArgs.wheelRight);
-
 	CmdMoveRoombaArgs_t *args = CmdMoveRoomba_decode(msg);
-	uart_putchar(args->wheelLeft);
-	uart_putchar(args->wheelRight);
 
 	CmdArgs_free(args);
 
@@ -57,9 +51,11 @@ void Test_MessageDecode()
 #endif
 
 struct {
-	uint16_t velocity;
-	uint16_t radius;
+	int16_t velocity;
+	int16_t radius;
 } g_lastControllerArgs;
+
+roomba_sensor_data_t g_lastRoombaSensorData;
 
 void HandleCmd_MoveRoomba(CmdMoveRoombaArgs_t* args)
 {
@@ -88,12 +84,20 @@ void Task_PollBluetooth(void* args)
 
 }
 
+void Task_PollRoombaSensors(void* args)
+{
+	Roomba_UpdateSensorPacket(EXTERNAL, &g_lastRoombaSensorData);
+}
+
 void Task_UpdateRoombaSpeed(void* args)
 {
 	DDRB = 0xFF;
 	PORTB = 0xFF;
 
-	Roomba_Drive(g_lastControllerArgs.velocity, g_lastControllerArgs.radius);
+	// In the interest of not smashing my computer, default to straight for now.
+	Roomba_Drive(g_lastControllerArgs.velocity, 0x8000);
+	// TODO: add check for last bluetooth update time?
+	//    If we haven't gotten a command from the joystick in ~2-3 seconds, stop.
 
 	PORTB = 0x00;
 }
@@ -101,13 +105,13 @@ void Task_UpdateRoombaSpeed(void* args)
 int main() 
 {
 	Roomba_Init();
-	uart_init(UART_0, UART_9600);
-	g_lastControllerArgs.velocity = 300;
+	uart_init(UART_1, UART_9600);
 
 	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;
 
 	Scheduler_Init();
 	Scheduler_StartPeriodicTask(0,  100, Task_PollBluetooth,     NULL);
 	Scheduler_StartPeriodicTask(25, 100, Task_UpdateRoombaSpeed, NULL);
+	Scheduler_StartPeriodicTask(50, 500, Task_PollRoombaSensors, NULL);
 	Scheduler_Start();
 }
