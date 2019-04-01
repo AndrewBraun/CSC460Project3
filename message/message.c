@@ -34,7 +34,6 @@ CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf)
     return moveArgs;
 }
 
-
 int8_t Cmd_decodenext()
 {
     int opcode = uart_get_byte(BLUETOOTH_UART, 0);
@@ -58,6 +57,15 @@ int8_t Cmd_decodenext()
                 (*g_messageHandlers.HandleCmd_MoveRoomba)(args);
             break;
         }
+		case Cmd_TurnOnLaser: {
+			// DDRB |= (1 << LASER_PORT);
+			// PORTB |= (1 << LASER_PORT);
+			break;
+		}
+		case Cmd_TurnOffLaser: {
+			// PORTB &= ~(1 << LASER_PORT);
+			break;
+		}
         default:
             // Unrecognized opcode
             return -1;

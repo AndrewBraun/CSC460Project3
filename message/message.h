@@ -10,13 +10,19 @@
 // Possible commands which can be sent. Opcodes are one byte, so there
 // should be a maximum of 256 possible operations.
 typedef enum {
-    Cmd_MoveRoomba
+    Cmd_MoveRoomba,
+	Cmd_TurnOnLaser,
+	Cmd_TurnOffLaser,
 } CmdOpCode_t;
+
+/*
+ * Command: Turn On Laser
+ */
+#define LASER_PORT PB7
 
 /*
  * Command: Move Roomba
  */
-
 typedef struct {
     int16_t velocity;
     int16_t radius;

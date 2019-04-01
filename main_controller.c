@@ -11,6 +11,7 @@
 #include "joystick/joystick.h"
 #include "uart/uart.h"
 #include "message/message.h"
+#include "button/button.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -82,13 +83,15 @@ which sets up and runs a test.
 int main() {
 	joystick_init(&servo_joystick, PF0, PF1);
 	joystick_init(&roomba_joystick, PF6, PF7);
+	button_init();
 	uart_init(UART_1, UART_9600);
 	
 	Scheduler_Init();
 	
 	Scheduler_StartPeriodicTask(1, 25, read_joystick_task, &servo_joystick);
 	Scheduler_StartPeriodicTask(6, 25, read_joystick_task, &roomba_joystick);
-	Scheduler_StartPeriodicTask(12, 100, send_roomba_joystick_task, NULL);
+	//Scheduler_StartPeriodicTask(12, 100, send_roomba_joystick_task, NULL);
+	Scheduler_StartPeriodicTask(13, 100, read_laser_button_task, NULL);
 	//Scheduler_StartPeriodicTask(10, 25, send_message_task, NULL);
 
 	Scheduler_StartPeriodicTask(30000,30000,switch_mode_task,NULL);
