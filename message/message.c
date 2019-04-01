@@ -60,10 +60,12 @@ int8_t Cmd_decodenext()
 		case Cmd_TurnOnLaser: {
 			// DDRB |= (1 << LASER_PORT);
 			// PORTB |= (1 << LASER_PORT);
+			uart_reset_receive(BLUETOOTH_UART);
 			break;
 		}
 		case Cmd_TurnOffLaser: {
 			// PORTB &= ~(1 << LASER_PORT);
+			uart_reset_receive(BLUETOOTH_UART);
 			break;
 		}
         default:
