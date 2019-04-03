@@ -33,19 +33,6 @@ void switch_mode_task(void* param_ptr){
 	PORTB = 0x00;
 }
 
-void send_message_task(void* param_ptr){
-	
-	DDRB = 0xFF;
-	PORTB = 0xFF;
-
-	uart_putchar(UART_1, servo_joystick.x_value);
-	uart_putchar(UART_1, servo_joystick.y_value);
-	uart_putchar(UART_1, roomba_joystick.x_value);
-	uart_putchar(UART_1, roomba_joystick.y_value);
-	
-	PORTB = 0x00;
-}
-
 /*
  * There are two types of movement:
  *		1) Forward/backward (right and left wheels have the same value)
@@ -102,9 +89,8 @@ int main() {
 	
 	Scheduler_StartPeriodicTask(1, 25, read_joystick_task, &servo_joystick);
 	Scheduler_StartPeriodicTask(6, 25, read_joystick_task, &roomba_joystick);
-	//Scheduler_StartPeriodicTask(12, 100, send_roomba_joystick_task, NULL);
-	Scheduler_StartPeriodicTask(13, 100, read_laser_button_task, NULL);
-	//Scheduler_StartPeriodicTask(10, 25, send_message_task, NULL);
+	Scheduler_StartPeriodicTask(12, 100, send_roomba_joystick_task, NULL);
+	//Scheduler_StartPeriodicTask(13, 100, read_laser_button_task, NULL);
 
 	Scheduler_StartPeriodicTask(30000,30000,switch_mode_task,NULL);
 	
