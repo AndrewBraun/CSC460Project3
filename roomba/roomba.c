@@ -172,6 +172,14 @@ void Roomba_Drive( int16_t velocity, int16_t radius )
 	uart_putchar(ROOMBA_UART, LOW_BYTE(radius));
 }
 
+void Roomba_Drive_Direct(int16_t right, int16_t left) {
+	uart_putchar(ROOMBA_UART, D_DIRECT);
+	uart_putchar(ROOMBA_UART, HIGH_BYTE(right));
+	uart_putchar(ROOMBA_UART, LOW_BYTE(right));
+	uart_putchar(ROOMBA_UART, HIGH_BYTE(left));
+	uart_putchar(ROOMBA_UART, LOW_BYTE(left));
+}
+
 /**
  * Update the LEDs on the Roomba to match the configured state
  */

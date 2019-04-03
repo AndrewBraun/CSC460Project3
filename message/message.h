@@ -24,8 +24,8 @@ typedef enum {
  * Command: Move Roomba
  */
 typedef struct {
-    int16_t velocity;
-    int16_t radius;
+    int16_t right;
+    int16_t left;
 } CmdMoveRoombaArgs_t;
 
 int8_t CmdMoveRoomba_encode(char **msgBuf, CmdMoveRoombaArgs_t const* args);

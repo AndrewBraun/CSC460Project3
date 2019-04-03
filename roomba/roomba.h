@@ -88,6 +88,11 @@ void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* 
 void Roomba_Drive( int16_t velocity, int16_t radius );
 
 /**
+ * Command the Roomba to move by controlling each wheel independently.
+ */
+void Roomba_Drive_Direct( int16_t right, int16_t left);
+
+/**
  * Change the Roomba's state to passive mode, safe mode, or full mode.  The Roomba_Init function puts the Roomba into safe mode.
  * If the Roomba is already in the state requested, then nothing will happen.  Otherwise, the Roomba will be put in the new state and
  * a 20 ms delay will be executed (per the SCI specification).

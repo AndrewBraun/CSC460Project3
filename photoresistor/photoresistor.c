@@ -4,9 +4,10 @@
  * Created: 2019-04-01 3:20:45 PM
  *  Author: Andrew
  */
+#include <avr/io.h>
 #include "../roomba/roomba.h"
 
-#define PHOTORESISTOR_PIN PK8
+#define PHOTORESISTOR_PIN PK0
 
 /*
  * The "health" of the robot.
@@ -32,8 +33,8 @@ void shadow_realm() {
 	// Credit: http://www.mariopiano.com/mario-sheet-music-death-sound.html
 	uint8_t death_song[12] = {103, 110, 0, 110, 110, 108, 107, 103, 100, 0, 100, 96};
 	uint8_t song_timings[12] = {16, 16, 16, 16, 16, 16, 32, 16, 16, 16, 16, 16};
-	Roomba_LoadSong(0, death_song, song_timings, 12);
-	Roomba_PlaySong(0);
+	Roomba_LoadSong(15, death_song, song_timings, 12);
+	Roomba_PlaySong(15);
 	
 	while(1);
 }
@@ -48,7 +49,7 @@ void read_photoresistor_task(void* param_ptr){
 	while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
 	
 	// If the robot is not being pointed at, set health to 20.
-	if (ADCH >= 300) {
+	if (ADCH >= 130) {
 		health = 20;
 	}
 	// If the robot is being pointed at

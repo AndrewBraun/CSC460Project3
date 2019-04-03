@@ -46,21 +46,33 @@ void send_message_task(void* param_ptr){
 	PORTB = 0x00;
 }
 
+/*
+ * There are two types of movement:
+ *		1) Forward/backward (right and left wheels have the same value)
+ *		2) Turn (right and left wheels have the opposite values)
+ * We can only get into the forward/backward state if two conditions are met:
+ *		1) The robot is in "Cruise" mode
+ *		2) The joystick is pointed more up/down that it is pointed to the side
+ *		In other words, the y value offset is greater than the x value offset.
+ */
 void send_roomba_joystick_task(void* param_ptr){
 	DDRB = 0xFF;
 	PORTB = 0x00;
 	
 	CmdMoveRoombaArgs_t args;
 	
-	if (CurrentMode == CRUISE){
-		// Mode when the Roomba is allowed to move freely
-		args.radius = (((int16_t) (roomba_joystick.x_value)) - 127) * 15;
+	int16_t x_value = ((int16_t) (roomba_joystick.x_value)) - 127;
+	int16_t y_value = ((int16_t) (roomba_joystick.y_value)) - 127;
+	
+	if (CurrentMode == CRUISE && abs(y_value) >= abs(x_value)){
+		// Mode when the Roomba moves forward or backward
+		args.left = y_value * -7 / 2;
+		args.right = args.left;
 	} else {
 		// Mode when the Roomba can only turn
-		// Gets the highest bit to get the clockwise/counterclockwise direction
-		args.radius = pow(-1, ((int16_t) (roomba_joystick.x_value - 127)) >> 15);
+		args.left = x_value * 7 / 2;
+		args.right = -args.left;
 	}
-	args.velocity = (((int16_t) (roomba_joystick.y_value)) - 127) * -7 / 2;
 	
 	char* msgBuf;
 	int len = CmdMoveRoomba_encode(&msgBuf, &args);
