@@ -51,16 +51,16 @@ void Test_MessageDecode()
 #endif
 
 struct {
-	int16_t velocity;
-	int16_t radius;
+	int16_t right;
+	int16_t left;
 } g_lastControllerArgs;
 
 roomba_sensor_data_t g_lastRoombaSensorData;
 
 void HandleCmd_MoveRoomba(CmdMoveRoombaArgs_t* args)
 {
-	g_lastControllerArgs.velocity = args->velocity;
-	g_lastControllerArgs.radius = args->radius;
+	g_lastControllerArgs.right = args->right;
+	g_lastControllerArgs.left = args->left;
 
 	// Command handlers are responsible for freeing args!
 	CmdArgs_free(args);
@@ -95,7 +95,7 @@ void Task_UpdateRoombaSpeed(void* args)
 	PORTB = 0xFF;
 
 	// In the interest of not smashing my computer, default to straight for now.
-	Roomba_Drive(g_lastControllerArgs.velocity, 0x8000);
+	Roomba_Drive_Direct(g_lastControllerArgs.right, g_lastControllerArgs.left);
 	// TODO: add check for last bluetooth update time?
 	//    If we haven't gotten a command from the joystick in ~2-3 seconds, stop.
 
