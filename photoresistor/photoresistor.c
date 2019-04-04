@@ -33,8 +33,8 @@ void shadow_realm() {
 	// Credit: http://www.mariopiano.com/mario-sheet-music-death-sound.html
 	uint8_t death_song[12] = {79, 86, 0, 86, 86, 84, 83, 79, 76, 0, 76, 72};
 	uint8_t song_timings[12] = {16, 16, 16, 16, 16, 16, 32, 16, 16, 16, 16, 16};
-	Roomba_LoadSong(15, death_song, song_timings, 12);
-	Roomba_PlaySong(15);
+	Roomba_LoadSong(0, death_song, song_timings, 12);
+	Roomba_PlaySong(0);
 	
 	while(1);
 }
