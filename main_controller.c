@@ -51,14 +51,24 @@ void send_roomba_joystick_task(void* param_ptr){
 	int16_t x_value = ((int16_t) (roomba_joystick.x_value)) - 127;
 	int16_t y_value = ((int16_t) (roomba_joystick.y_value)) - 127;
 	
-	if (CurrentMode == CRUISE && abs(y_value) >= abs(x_value)){
-		// Mode when the Roomba moves forward or backward
-		args.left = y_value * -7 / 2;
-		args.right = args.left;
-	} else {
-		// Mode when the Roomba can only turn
-		args.left = x_value * 7 / 2;
-		args.right = -args.left;
+	// Deadband
+	if (abs(x_value) < 50 && abs(y_value) < 50) {
+		args.left = 0;
+		args.right = 0;
+	}
+	
+	else {
+		if (CurrentMode == CRUISE && abs(y_value) >= abs(x_value)){
+			// Mode when the Roomba moves forward or backward
+			//args.left = (y_value * -7) / 2;
+			args.right = (y_value * -5) / 2;
+			args.left = args.right;
+		} else {
+			// Mode when the Roomba can only turn
+			//args.left = x_value * 7 / 2;
+			args.right = (x_value * 5) / 2;
+			args.left = -args.right;
+		}
 	}
 	
 	char* msgBuf;
