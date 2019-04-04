@@ -9,6 +9,8 @@
 #ifndef PHOTORESISTOR_H_
 #define PHOTORESISTOR_H_
 
+void photoresistor_init();
+
 void read_photoresistor_task(void* param_ptr);
 
 #endif /* PHOTORESISTOR_H_ */

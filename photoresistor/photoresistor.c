@@ -39,6 +39,10 @@ void shadow_realm() {
 	while(1);
 }
 
+void photoresistor_init(){
+	DDRK != ~(1 << PHOTORESISTOR_PIN);
+}
+
 void read_photoresistor_task(void* param_ptr){
 	ADMUX = (1 << REFS0) | (1 << ADLAR) | PHOTORESISTOR_PIN; // Sets ADC to look at photoresistor.
 	ADCSRA |= (1 << ADSC); // Start conversion
