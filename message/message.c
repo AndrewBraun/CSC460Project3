@@ -29,7 +29,7 @@ CmdMoveRoombaArgs_t *CmdMoveRoomba_decode(char const* msgBuf)
     CmdMoveRoombaArgs_t *moveArgs = malloc(sizeof(CmdMoveRoombaArgs_t));
 
     moveArgs->right = (msgBuf[1] << 8 | msgBuf[2]);
-    moveArgs->right = (msgBuf[3] << 8 | msgBuf[4]);
+    moveArgs->left = (msgBuf[3] << 8 | msgBuf[4]);
 
     return moveArgs;
 }
