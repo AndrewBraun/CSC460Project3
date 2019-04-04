@@ -81,23 +81,39 @@ void Task_PollBluetooth(void* args)
 
 		PORTB = 0x00;
 	}
-
 }
+
+/*
+ * The amount of times (run-throughs of Task_UpdateRoombaSpeed)
+ * left where the user does not have control.
+ * Will go into this state if a bumper/IR wall is detected.
+ */
+uint8_t autonomous_time = 0;
 
 void Task_PollRoombaSensors(void* args)
 {
 	Roomba_UpdateSensorPacket(EXTERNAL, &g_lastRoombaSensorData);
+	if (g_lastRoombaSensorData.bumps_wheeldrops & 0x0F || g_lastRoombaSensorData.virtual_wall) {
+		// Go into autonomous mode
+		Roomba_Drive_Direct(-400, -400);
+		autonomous_time = 10;
+	}
 }
 
-void Task_UpdateRoombaSpeed(void* args)
-{
+void Task_UpdateRoombaSpeed(void* args){
 	DDRB = 0xFF;
 	PORTB = 0xFF;
-
-	// In the interest of not smashing my computer, default to straight for now.
-	Roomba_Drive_Direct(g_lastControllerArgs.right, g_lastControllerArgs.left);
+	
+	// If the Roomba is in autonomous mode
+	if (autonomous_time) {
+		autonomous_time--;
+	}
+	// If the Roomba is in user-control mode
+	else {
+			Roomba_Drive_Direct(g_lastControllerArgs.right, g_lastControllerArgs.left);
 	// TODO: add check for last bluetooth update time?
 	//    If we haven't gotten a command from the joystick in ~2-3 seconds, stop.
+	}
 
 	PORTB = 0x00;
 }
