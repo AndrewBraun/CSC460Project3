@@ -5,7 +5,9 @@
  *  Author: Andrew
  */
 #include <avr/io.h>
+#include <util/delay.h>
 #include "../roomba/roomba.h"
+#include "../uart/uart.h"
 
 #define PHOTORESISTOR_PIN PK0
 
@@ -26,6 +28,8 @@ int8_t health = 20;
  * Stops robot and plays death song.
  */
 void shadow_realm() {
+	
+
 	// Write "stop moving" to Roomba
 	Roomba_Drive(0, 0);
 	
@@ -36,14 +40,20 @@ void shadow_realm() {
 	Roomba_LoadSong(0, death_song, song_timings, 12);
 	Roomba_PlaySong(0);
 	
-	while(1);
+	while(1)
+	{
+		PORTB = 0xFF;
+		_delay_ms(50);
+		PORTB = 0x00;
+		_delay_ms(50);
+	};
 }
 
 void photoresistor_init(){
-	DDRK != ~(1 << PHOTORESISTOR_PIN);
+	ADCSRA |= (1 << ADEN);
 }
 
-void read_photoresistor_task(void* param_ptr){
+void Task_UpdatePhotoresistor(void* param_ptr){
 	ADMUX = (1 << REFS0) | (1 << ADLAR) | PHOTORESISTOR_PIN; // Sets ADC to look at photoresistor.
 	ADCSRA |= (1 << ADSC); // Start conversion
 	while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
@@ -53,14 +63,20 @@ void read_photoresistor_task(void* param_ptr){
 	while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
 	
 	// If the robot is not being pointed at, set health to 20.
-	if (ADCH >= 130) {
-		health = 20;
-	}
-	// If the robot is being pointed at
-	else {
-		health--;
-		if (!health){
-			shadow_realm();
-		}
-	}
+	//uint16_t nextVal = (ADCL | (ADCH << 8));
+
+	uart_init(UART_0, UART_9600);
+	uart_putchar(UART_0, ADCL);
+	uart_putchar(UART_0, ADCH);
+
+	// if (nextVal <= 125) {
+	// 	health = 20;
+	// }
+	// // If the robot is being pointed at
+	// else {
+	// 	health--;
+	// 	if (!health){
+	// 		shadow_realm();
+	// 	}
+	// }
 }

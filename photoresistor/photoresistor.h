@@ -11,6 +11,6 @@
 
 void photoresistor_init();
 
-void read_photoresistor_task(void* param_ptr);
+void Task_UpdatePhotoresistor(void* param_ptr);
 
 #endif /* PHOTORESISTOR_H_ */
