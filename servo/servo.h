@@ -9,18 +9,20 @@
 #ifndef SERVO_H_
 #define SERVO_H_
 
+uint8_t positions[5] = {100, 90, 80, 70, 60};
+
 /*
  * Servo struct used by the Roomba Arduino.
  * Pin is the signal pin for the servo motor.
- * Position is the servo's current position from 0 to 180.
+ * Position is the servo's current position
  * Velocity is the direction the servo will move when update_servo_task is called.
- * If velocity = 1, position will be incremented up to 180
- * If veloctiy = -1, position will be decremented down to 0.
+ * If velocity = 1, position will be incremented
+ * If veloctiy = -1, position will be decremented
  * If velocity = 0, position will not be changed.
  */
 typedef struct servo{
 	uint8_t pin;
-	uint8_t position;
+	int8_t position;
 	int8_t velocity;
 } Servo;
 
