@@ -9,7 +9,9 @@
 #include "../roomba/roomba.h"
 #include "../uart/uart.h"
 
-#define PHOTORESISTOR_PIN PK0
+#define PHOTORESISTOR_PIN PF0
+
+#define PHOTORESISTOR_THRESH 45
 
 /*
  * The "health" of the robot.
@@ -44,12 +46,12 @@ void shadow_realm() {
 }
 
 void photoresistor_init(){
-	DDRK &= ~(1 << PHOTORESISTOR_PIN);
+	DDRF &= ~(1 << PHOTORESISTOR_PIN);
 	ADCSRA |= (1 << ADEN);
 }
 
 void Task_UpdatePhotoresistor(void* param_ptr){
-	ADMUX = (1 << REFS0) | (1 << ADLAR) | 0x08; // Sets ADC to look at photoresistor.
+	ADMUX = (1 << REFS0) | (1 << ADLAR); // Sets ADC to look at photoresistor.
 	ADCSRA |= (1 << ADSC); // Start conversion
 	while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
 	
@@ -64,14 +66,14 @@ void Task_UpdatePhotoresistor(void* param_ptr){
 	//uart_putchar(UART_0, ADCL);
 	uart_putchar(UART_0, ADCH);
 
-	// if (nextVal <= 125) {
-	// 	health = 20;
-	// }
-	// // If the robot is being pointed at
-	// else {
-	// 	health--;
-	// 	if (!health){
-	// 		shadow_realm();
-	// 	}
-	// }
+	if (ADCH <= PHOTORESISTOR_THRESH) {
+		health = 20;
+	}
+	// If the robot is being pointed at
+	else {
+		health--;
+		if (!health){
+			shadow_realm();
+		}
+	}
 }
