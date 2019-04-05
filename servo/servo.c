@@ -20,8 +20,10 @@ void send_servo_joystick_task(void* param_ptr){
 	int8_t tilt_velocity = 0;
 		
 	// Deadband
-	if (abs(x_value) >= 50 || abs(y_value) >= 50) {
+	if (abs(x_value) >= 50) {
 		pan_velocity = x_value > 0 ? 1 : -1;
+	}
+	if(abs(y_value) >= 50) {
 		tilt_velocity = y_value > 0 ? 1 : -1;
 	}
 	
@@ -48,6 +50,8 @@ void servo_init(Servo* servo, uint8_t pin){
 	servo->position = 90;
 	servo->velocity = 0;
 }
+
+uint8_t positions[5] = {100, 90, 80, 70, 60};
 
 void Task_UpdateServo(void* servo_arg){
 	Servo* servo = (Servo *) servo_arg;

@@ -9,8 +9,6 @@
 #ifndef SERVO_H_
 #define SERVO_H_
 
-uint8_t positions[5] = {100, 90, 80, 70, 60};
-
 /*
  * Servo struct used by the Roomba Arduino.
  * Pin is the signal pin for the servo motor.
