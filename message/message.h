@@ -19,7 +19,7 @@ typedef enum {
 /*
  * Command: Turn On Laser
  */
-#define LASER_PORT PB6
+#define LASER_PORT PL7
 
 /*
  * Command: Move Roomba

@@ -68,20 +68,19 @@ int8_t Cmd_decodenext()
 			break;
 		}
 		case Cmd_TurnOnLaser: {
-			DDRB |= (1 << LASER_PORT);
-			PORTB |= (1 << LASER_PORT);
+			DDRL |= (1 << LASER_PORT);
+			PORTL |= (1 << LASER_PORT);
 			uart_reset_receive(BLUETOOTH_UART);
 			break;
 		}
 		case Cmd_TurnOffLaser: {
-			PORTB &= ~(1 << LASER_PORT);
+			PORTL &= ~(1 << LASER_PORT);
 			uart_reset_receive(BLUETOOTH_UART);
 			break;
 		}
         default:
             // Unrecognized opcode
             return -1;
-
     }
 
     uart_reset_receive(BLUETOOTH_UART);  // clear uart buffer
