@@ -68,18 +68,14 @@ void HandleCmd_MoveRoomba(CmdMoveRoombaArgs_t* args)
 
 void Task_PollBluetooth(void* args)
 {
-	DDRB = 0xFF;
 
 	// Bluetooth should be on UART 1
 	if (uart_bytes_received(UART_1) > 0)
 	{
-		PORTB = 0xFF;
-
 		// Decode next command from UART 1. This may dispatch a sporadic task
 		// to handle the new message.
 		Cmd_decodenext();
 
-		PORTB = 0x00;
 	}
 }
 
@@ -92,7 +88,7 @@ uint8_t autonomous_time = 0;
 
 void Task_PollRoombaSensors(void* args)
 {
-	Roomba_UpdateSensorPacket(EXTERNAL, &g_lastRoombaSensorData);
+	Roomba_AsyncUpdateSensorPacket(EXTERNAL, &g_lastRoombaSensorData);
 	if (g_lastRoombaSensorData.bumps_wheeldrops & 0x0F || g_lastRoombaSensorData.virtual_wall) {
 		// Go into autonomous mode
 		Roomba_Drive_Direct(-400, -400);
@@ -101,9 +97,6 @@ void Task_PollRoombaSensors(void* args)
 }
 
 void Task_UpdateRoombaSpeed(void* args){
-	DDRB = 0xFF;
-	PORTB = 0xFF;
-	
 	// If the Roomba is in autonomous mode
 	if (autonomous_time) {
 		autonomous_time--;
@@ -114,12 +107,11 @@ void Task_UpdateRoombaSpeed(void* args){
 	// TODO: add check for last bluetooth update time?
 	//    If we haven't gotten a command from the joystick in ~2-3 seconds, stop.
 	}
-
-	PORTB = 0x00;
 }
 
 int main() 
 {
+	DDRB = 0xff;
 	Roomba_Init();
 	uart_init(UART_1, UART_9600);
 
