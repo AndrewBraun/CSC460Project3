@@ -206,10 +206,13 @@ void uart_reset_receive(uint8_t uart_id)
 	{
 	case UART_0:
 		uart_buffer_index_0 = 0;
+		break;
 	case UART_1:
 		uart_buffer_index_1 = 0;
+		break;
 	case UART_2:
 		uart_buffer_index_2 = 0;
+		break;
 	}
 }
 
