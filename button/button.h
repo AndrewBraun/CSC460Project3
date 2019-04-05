@@ -24,4 +24,8 @@ void button_init();
  */
 void read_laser_button_task(void* param_ptr);
 
+void toggle_laser();
+
+void Task_Check_Laser(void* param_ptr);
+
 #endif /* BUTTON_H_ */

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "../uart/uart.h"
 #include "../servo/servo.h"
+#include "../button/button.h"
 
 #include "message.h"
 
@@ -67,14 +68,8 @@ int8_t Cmd_decodenext()
 			tilt_servo.velocity = uart_get_byte(BLUETOOTH_UART, 2);
 			break;
 		}
-		case Cmd_TurnOnLaser: {
-			DDRL |= (1 << LASER_PORT);
-			PORTL |= (1 << LASER_PORT);
-			uart_reset_receive(BLUETOOTH_UART);
-			break;
-		}
-		case Cmd_TurnOffLaser: {
-			PORTL &= ~(1 << LASER_PORT);
+		case Cmd_ToggleLaser: {
+			toggle_laser();
 			uart_reset_receive(BLUETOOTH_UART);
 			break;
 		}

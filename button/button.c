@@ -31,30 +31,18 @@ void button_init(){
 
 void turnOnLaser(){
 	laser_on = 1;
-	uart_putchar(UART_1, Cmd_TurnOnLaser);
+	DDRL |= (1 << LASER_PORT);
+	PORTL |= (1 << LASER_PORT);
 }
 
 void turnOffLaser(){
 	laser_on = 0;
-	uart_putchar(UART_1, Cmd_TurnOffLaser);
+	PORTL &= ~(1 << LASER_PORT);
 }
 
 // Button not pushed = 0x20
 // Button pushed = 0x00
 void read_laser_button_task(void* param_ptr){
-	
-	//Skip reading the button if we don't have any more laser time.
-	if (laser_time <= 0) return;
-	
-	// Decrement the laser time if the laser is on.
-	// If the laser time is up, turn off the laser.
-	if (laser_on){
-		laser_time--;
-		if (laser_time <= 0) {
-			turnOffLaser();
-			return;
-		}
-	}
 	
 	// Read button value
 	// Credit: http://forum.arduino.cc/index.php?topic=91079.15
@@ -62,14 +50,28 @@ void read_laser_button_task(void* param_ptr){
 	
 	// If the button is being pushed down and the previous value is not "pushed"
 	if (!new_button_value && button_value) {
-
-		if (!laser_on && laser_time){
-			turnOnLaser();
-		}
-		else {
-			turnOffLaser();
-		}
+		uart_putchar(UART_1, Cmd_ToggleLaser);
 	}
 	
 	button_value = new_button_value;
+}
+
+void toggle_laser(){
+	if (laser_time && !laser_on){
+		turnOnLaser();
+	} else {
+		turnOffLaser();
+	}
+}
+
+void Task_Check_Laser(void* param_ptr){
+	//Skip reading the button if we don't have any more laser time.
+	if (laser_time <= 0 || !laser_on) return;
+		
+	// Decrement the laser time if the laser is on.
+	// If the laser time is up, turn off the laser.
+	laser_time--;
+	if (laser_time <= 0) {
+		turnOffLaser();
+	}
 }

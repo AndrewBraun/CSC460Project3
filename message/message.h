@@ -11,8 +11,7 @@
 // should be a maximum of 256 possible operations.
 typedef enum {
     Cmd_MoveRoomba,
-	Cmd_TurnOnLaser,
-	Cmd_TurnOffLaser,
+	Cmd_ToggleLaser,
 	Cmd_MoveServos,
 } CmdOpCode_t;
 
