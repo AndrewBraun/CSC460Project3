@@ -5,10 +5,13 @@
  *      Author: nrqm
  */
 
+#include <stdlib.h>
 #include <util/delay.h>
+
 #include "../uart/uart.h"
 #include "roomba.h"
 #include "roomba_sci.h"
+#include "../tta.h"
 //#include "sensor_struct.h"
 
 #define LOW_BYTE(v)   ((unsigned char) (v))
@@ -85,16 +88,18 @@ uint8_t wait_for_bytes(uint8_t num_bytes, uint8_t timeout)
 		return 0;
 }*/
 
-void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* sensor_packet)
+static void Roomba_ReadSensorParamsUpdate(void* args)
 {
-	// No, I don't feel bad about manual loop unrolling.
-	uart_putchar(ROOMBA_UART, SENSORS);
-	uart_putchar(ROOMBA_UART, group);
+	PORTB = 0xFF;
+	ROOMBA_SENSOR_GROUP group = ((RoombaSensorUpdateArgs_t*)args)->group;
+	roomba_sensor_data_t* sensor_packet = ((RoombaSensorUpdateArgs_t*)args)->sensor_packet;
+
 	switch(group)
 	{
 	case EXTERNAL:
 		// environment sensors
-		while (uart_bytes_received(ROOMBA_UART) != 10);
+		if (uart_bytes_received(ROOMBA_UART) != 10)  // skip update if we haven't gotten all bytes
+			break;
 		sensor_packet->bumps_wheeldrops = uart_get_byte(ROOMBA_UART, 0);
 		sensor_packet->wall = uart_get_byte(ROOMBA_UART, 1);
 		sensor_packet->cliff_left = uart_get_byte(ROOMBA_UART, 2);
@@ -108,7 +113,8 @@ void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* 
 		break;
 	case CHASSIS:
 		// chassis sensors
-		while (uart_bytes_received(ROOMBA_UART) != 6);
+		if (uart_bytes_received(ROOMBA_UART) != 6)
+			break;
 		sensor_packet->remote_opcode = uart_get_byte(ROOMBA_UART, 0);
 		sensor_packet->buttons = uart_get_byte(ROOMBA_UART, 1);
 		sensor_packet->distance.bytes.high_byte = uart_get_byte(ROOMBA_UART, 2);
@@ -118,7 +124,8 @@ void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* 
 		break;
 	case INTERNAL:
 		// internal sensors
-		while (uart_bytes_received(ROOMBA_UART) != 10);
+		if (uart_bytes_received(ROOMBA_UART) != 10)
+			break;
 		sensor_packet->charging_state = uart_get_byte(ROOMBA_UART, 0);
 		sensor_packet->voltage.bytes.high_byte = uart_get_byte(ROOMBA_UART, 1);
 		sensor_packet->voltage.bytes.low_byte = uart_get_byte(ROOMBA_UART, 2);
@@ -132,8 +139,18 @@ void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* 
 		break;
 	}
 	uart_reset_receive(ROOMBA_UART);
+	free(args);
+	PORTB = 0x00;
 }
 
+void Roomba_AsyncUpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* sensor_packet)
+{
+	uart_putchar(ROOMBA_UART, SENSORS);
+	uart_putchar(ROOMBA_UART, group);
+	
+	RoombaSensorUpdateArgs_t* args = malloc(sizeof(RoombaSensorUpdateArgs_t));
+	Scheduler_AddSporadicTask(20, 10, Roomba_ReadSensorParamsUpdate, args);
+}
 
 void Roomba_ChangeState(ROOMBA_STATE newState)
 {

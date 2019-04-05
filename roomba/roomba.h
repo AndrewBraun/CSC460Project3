@@ -19,6 +19,12 @@ typedef enum _rstate
 	FULL_MODE,
 } ROOMBA_STATE;
 
+typedef struct 
+{
+        ROOMBA_SENSOR_GROUP group;
+        roomba_sensor_data_t* sensor_packet;
+} RoombaSensorUpdateArgs_t;
+
 /**
  * Turn on the Roomba with the serial port DD pin, configure the SCI to operate at 38400 baud, put the Roomba into safe mode,
  * and configure the LEDs to their default values.
@@ -67,7 +73,7 @@ void Roomba_Init();
  * to update one group per tick.  Updating more than one group takes at least 5.2 ms, so it's impossible to update two or three groups
  * in the same tick without modifying the definition of this function.
  */
-void Roomba_UpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* sensor_packet);
+void Roomba_AsyncUpdateSensorPacket(ROOMBA_SENSOR_GROUP group, roomba_sensor_data_t* sensor_packet);
 
 /**
  * Command the Roomba to move.
