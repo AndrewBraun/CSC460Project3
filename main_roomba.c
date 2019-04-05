@@ -6,6 +6,7 @@
 #include "uart/uart.h"
 #include "message/message.h"
 #include "roomba/roomba.h"
+#include "photoresistor/photoresistor.h"
 #include "tta.h"
 
 #include <stddef.h>
@@ -122,5 +123,6 @@ int main()
 	Scheduler_StartPeriodicTask(0,  100, Task_PollBluetooth,     NULL);
 	Scheduler_StartPeriodicTask(25, 100, Task_UpdateRoombaSpeed, NULL);
 	Scheduler_StartPeriodicTask(50, 500, Task_PollRoombaSensors, NULL);
+	Scheduler_StartPeriodicTask(50, 100, Task_UpdatePhotoresistor, NULL);
 	Scheduler_Start();
 }
