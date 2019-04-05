@@ -26,7 +26,8 @@ LIB_SOURCES = \
 	uart/uart.c \
 	roomba/roomba.c \
 	message/message.c \
-	joystick/joystick.c
+	joystick/joystick.c \
+	button/button.c
 
 SOURCES_CONTROLLER = $(LIB_SOURCES) $(CONTROLLER_MAIN)
 SOURCES_ROOMBA = $(LIB_SOURCES) $(ROOMBA_MAIN)
