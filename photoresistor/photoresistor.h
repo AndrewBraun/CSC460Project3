@@ -13,4 +13,6 @@ void photoresistor_init();
 
 void Task_UpdatePhotoresistor(void* param_ptr);
 
+void shadow_realm();
+
 #endif /* PHOTORESISTOR_H_ */
