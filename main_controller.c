@@ -12,6 +12,7 @@
 #include "uart/uart.h"
 #include "message/message.h"
 #include "button/button.h"
+#include "servo/servo.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -21,8 +22,6 @@ typedef enum movement_mode{
 } MOVEMENT_MODE;
 
 static MOVEMENT_MODE CurrentMode;
-
-Joystick servo_joystick, roomba_joystick;
 
 void switch_mode_task(void* param_ptr){
 	DDRB = 0xFF;
@@ -100,7 +99,8 @@ int main() {
 	Scheduler_StartPeriodicTask(1, 25, read_joystick_task, &servo_joystick);
 	Scheduler_StartPeriodicTask(6, 25, read_joystick_task, &roomba_joystick);
 	Scheduler_StartPeriodicTask(12, 100, send_roomba_joystick_task, NULL);
-	//Scheduler_StartPeriodicTask(13, 100, read_laser_button_task, NULL);
+	Scheduler_StartPeriodicTask(77, 100, read_laser_button_task, NULL);
+	Scheduler_StartPeriodicTask(44, 100, Task_UpdateServo, NULL);
 
 	Scheduler_StartPeriodicTask(30000,30000,switch_mode_task,NULL);
 	
