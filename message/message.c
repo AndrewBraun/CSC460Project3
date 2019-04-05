@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include "../uart/uart.h"
+#include "../servo/servo.h"
 
 #include "message.h"
 
@@ -57,6 +58,15 @@ int8_t Cmd_decodenext()
                 (*g_messageHandlers.HandleCmd_MoveRoomba)(args);
             break;
         }
+		case Cmd_MoveServos: {
+			
+			if (uart_bytes_received(BLUETOOTH_UART) < 3)
+				return 1; // Note enough bytes received. Must wait!
+				
+			pan_servo.velocity = uart_get_byte(BLUETOOTH_UART, 1);
+			tilt_servo.velocity = uart_get_byte(BLUETOOTH_UART, 2);
+			break;
+		}
 		case Cmd_TurnOnLaser: {
 			// DDRB |= (1 << LASER_PORT);
 			// PORTB |= (1 << LASER_PORT);

@@ -13,6 +13,7 @@ typedef enum {
     Cmd_MoveRoomba,
 	Cmd_TurnOnLaser,
 	Cmd_TurnOffLaser,
+	Cmd_MoveServos,
 } CmdOpCode_t;
 
 /*

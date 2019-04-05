@@ -17,6 +17,8 @@ typedef struct joystick{
 	uint8_t y_pin;
 } Joystick;
 
+Joystick servo_joystick, roomba_joystick;
+
 void joystick_init(Joystick* joystick, uint8_t x_pin, uint8_t y_pin);
 
 void read_joystick_task(void* joystick_arg);
