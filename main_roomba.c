@@ -120,7 +120,7 @@ int main()
 	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;
 
 	Scheduler_Init();
-	Scheduler_StartPeriodicTask(0,  100, Task_PollBluetooth,     NULL);
+	Scheduler_StartPeriodicTask(0,  50, Task_PollBluetooth,     NULL);
 	Scheduler_StartPeriodicTask(25, 100, Task_UpdateRoombaSpeed, NULL);
 	Scheduler_StartPeriodicTask(50, 500, Task_PollRoombaSensors, NULL);
 	Scheduler_StartPeriodicTask(50, 100, Task_UpdatePhotoresistor, NULL);
