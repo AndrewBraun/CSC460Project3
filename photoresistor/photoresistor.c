@@ -50,6 +50,7 @@ void shadow_realm() {
 }
 
 void photoresistor_init(){
+	DDRK &= ~(1 << PHOTORESISTOR_PIN);
 	ADCSRA |= (1 << ADEN);
 }
 
@@ -66,7 +67,7 @@ void Task_UpdatePhotoresistor(void* param_ptr){
 	//uint16_t nextVal = (ADCL | (ADCH << 8));
 
 	uart_init(UART_0, UART_9600);
-	uart_putchar(UART_0, ADCL);
+	//uart_putchar(UART_0, ADCL);
 	uart_putchar(UART_0, ADCH);
 
 	// if (nextVal <= 125) {

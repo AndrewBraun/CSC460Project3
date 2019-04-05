@@ -114,6 +114,7 @@ int main()
 	DDRB = 0xff;
 	Roomba_Init();
 	uart_init(UART_1, UART_9600);
+	photoresistor_init();
 
 	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;
 
