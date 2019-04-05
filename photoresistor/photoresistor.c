@@ -42,13 +42,7 @@ void shadow_realm() {
 	Roomba_LoadSong(0, death_song, song_timings, 12);
 	Roomba_PlaySong(0);
 	
-	while(1)
-	{
-		PORTB = 0xFF;
-		_delay_ms(50);
-		PORTB = 0x00;
-		_delay_ms(50);
-	};
+	while(1);
 }
 
 void photoresistor_init(){
