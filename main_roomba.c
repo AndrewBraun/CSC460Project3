@@ -7,6 +7,7 @@
 #include "message/message.h"
 #include "roomba/roomba.h"
 #include "photoresistor/photoresistor.h"
+#include "servo/servo.h"
 #include "tta.h"
 
 #include <stddef.h>
@@ -107,7 +108,7 @@ void Task_UpdateRoombaSpeed(void* args){
 	}
 	// If the Roomba is in user-control mode
 	else {
-			Roomba_Drive_Direct(g_lastControllerArgs.right, g_lastControllerArgs.left);
+		Roomba_Drive_Direct(g_lastControllerArgs.right, g_lastControllerArgs.left);
 	// TODO: add check for last bluetooth update time?
 	//    If we haven't gotten a command from the joystick in ~2-3 seconds, stop.
 	}
@@ -116,9 +117,10 @@ void Task_UpdateRoombaSpeed(void* args){
 int main() 
 {
 	DDRB = 0xff;
-	Roomba_Init();
 	uart_init(UART_0, UART_9600);
 	uart_init(UART_1, UART_9600);
+
+	Roomba_Init();
 	photoresistor_init();
 
 	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;

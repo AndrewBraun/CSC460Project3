@@ -63,8 +63,6 @@ void Task_UpdatePhotoresistor(void* param_ptr){
 	//uint16_t nextVal = (ADCL | (ADCH << 8));
 
 	uart_init(UART_0, UART_9600);
-	//uart_putchar(UART_0, ADCL);
-	uart_putchar(UART_0, ADCH);
 
 	if (ADCH <= PHOTORESISTOR_THRESH) {
 		health = 20;
