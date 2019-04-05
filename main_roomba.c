@@ -90,11 +90,14 @@ uint8_t autonomous_time = 0;
 void Task_PollRoombaSensors(void* args)
 {
 	Roomba_AsyncUpdateSensorPacket(EXTERNAL, &g_lastRoombaSensorData);
+
 	if (g_lastRoombaSensorData.bumps_wheeldrops & 0x0F || g_lastRoombaSensorData.virtual_wall) {
 		// Go into autonomous mode
 		Roomba_Drive_Direct(-400, -400);
 		autonomous_time = 10;
 	}
+
+	uart_putchar(UART_0, g_lastRoombaSensorData.virtual_wall);
 }
 
 void Task_UpdateRoombaSpeed(void* args){
@@ -114,15 +117,17 @@ int main()
 {
 	DDRB = 0xff;
 	Roomba_Init();
+	uart_init(UART_0, UART_9600);
 	uart_init(UART_1, UART_9600);
 	photoresistor_init();
 
 	g_messageHandlers.HandleCmd_MoveRoomba = HandleCmd_MoveRoomba;
 
 	Scheduler_Init();
-	Scheduler_StartPeriodicTask(0,  25, Task_PollBluetooth,     NULL);
+	Scheduler_StartPeriodicTask(0,  50, Task_PollBluetooth,     NULL);
 	Scheduler_StartPeriodicTask(30, 100, Task_UpdateRoombaSpeed, NULL);
 	Scheduler_StartPeriodicTask(55, 500, Task_PollRoombaSensors, NULL);
 	Scheduler_StartPeriodicTask(80, 100, Task_UpdatePhotoresistor, NULL);
+	Scheduler_StartPeriodicTask(90, 100, Task_UpdateServo, NULL);
 	Scheduler_Start();
 }
